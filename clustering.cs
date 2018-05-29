@@ -10,19 +10,22 @@ namespace tryCluster{
         }
     }
     class Cluster{
-        
-    }
 
-    class KMclustering{
-        public int k = 1;
-        
-        public void createCluster(point ipt){
-            HashSet <point> newCL = new HashSet<point>();
-            addToCluster(newCL, ipt);
+        HashSet <point> CL;
+        point mean;
+        public Cluster(point ipt){
+            addToCluster(CL, ipt);
         }
         public void addToCluster(HashSet <point> cl, point ipt){
             cl.Add(ipt);
         }
+
+    }
+
+    class KMclustering{
+        public int k = 1;
+        public LinkedList<Cluster> CLlist;
+        
         public void clustering(point[] ipt){
             HashSet <int> iSet = new HashSet<int>();
             while(iSet.Count < k){
@@ -33,7 +36,7 @@ namespace tryCluster{
             }
             }
             foreach(int i in iSet){
-                createCluster(ipt[i]);
+                CLlist.AddLast(new Cluster(ipt[i]));
             }
         }
 
