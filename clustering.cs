@@ -18,17 +18,24 @@ namespace tryCluster{
         }
         public int CompareTo(point comparepoint)
         {
-        if (comparepoint == null){
-            return 1;
+            if (comparepoint == null){
+                return 1;
+            }
+            else{
+                    if(this.x == comparepoint.x){
+                        return this.y.CompareTo(comparepoint.y);
+                    }else{
+                        return this.x.CompareTo(comparepoint.x);
+                    }
+            }
         }
-        else{
-                if(this.x == comparepoint.x){
-                    return this.y.CompareTo(comparepoint.y);
-                }else{
-                    return this.x.CompareTo(comparepoint.x);
-                }
+        public bool Equals(point eqpoint){
+            if(this.x == eqpoint.x && this.y == eqpoint.y){
+            return true;
+            }else{
+            return false;
+            }
         }
-    }
     }
     class Cluster{
 
