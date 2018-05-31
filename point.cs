@@ -16,6 +16,9 @@ public class point: IComparable<point>, IEquatable<point>{
             this.x /= c;
             this.y /= c;
         }
+        public point mult(int m){
+            return new point(this.x *m,this.y *m);
+        }
         public int CompareTo(point comparepoint)
         {
             if (comparepoint == null){

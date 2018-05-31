@@ -4,25 +4,27 @@ using System.Collections.Generic;
 namespace tryCluster{
         class Cluster{
 
-        LinkedList<point> CL;
+        List<point> CL;
         point mean;
         public Cluster(point ipt){
             mean = ipt;
             addToCluster(CL, ipt);
         }
 
-        public void calclulateEV(){
-            point tmpSum = new point(0,0);
-            foreach(point n in CL){
-                tmpSum.addition(n);
-            }
-            tmpSum.divide(CL.Count);
+        public void calculateEV(){
+            CL.Sort();
+            for(int i = 0; i < CL.Count;++i){ // 1 cpu zyklus weniger!
+                point tmp = CL[i];
+                int counter = 1;
+                    while(i+1 <= CL.Count && CL[i+1]==tmp){
+                    counter++;
+                    ++i;
+                    }
+                mean.addition(tmp.mult(counter));
+                }
         }
-        public void calculateWeight(){
-
-        }
-        public void addToCluster(LinkedList<point> cl, point ipt){
-            cl.AddLast(ipt);
+        public void addToCluster(List<point> cl, point ipt){ //umschreiben
+            cl.Add(ipt);
         }
 
     }
