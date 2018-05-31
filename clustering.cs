@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 
 namespace tryCluster{
-    public struct point{
-        public double x, y;
+    public class point: IComparable<point>, IEquatable<point>{
+        private double x, y;
         public point(double px, double py){
             x = px;
             y = py;
         }
-        public void add(point ipt){
+        public void addition(point ipt){
             this.x += ipt.x;
             this.y += ipt.y;
         }
@@ -16,25 +16,41 @@ namespace tryCluster{
             this.x /= c;
             this.y /= c;
         }
+        public int CompareTo(point comparepoint)
+        {
+        if (comparepoint == null){
+            return 1;
+        }
+        else{
+                if(this.x == comparepoint.x){
+                    return this.y.CompareTo(comparepoint.y);
+                }else{
+                    return this.x.CompareTo(comparepoint.x);
+                }
+        }
+    }
     }
     class Cluster{
 
-        HashSet <point> CL;
+        LinkedList<point> CL;
         point mean;
         public Cluster(point ipt){
             mean = ipt;
             addToCluster(CL, ipt);
         }
 
-        public void calclulateMean(){
+        public void calclulateEV(){
             point tmpSum = new point(0,0);
             foreach(point n in CL){
-                tmpSum.add(n);
+                tmpSum.addition(n);
             }
             tmpSum.divide(CL.Count);
         }
-        public void addToCluster(HashSet <point> cl, point ipt){
-            cl.Add(ipt);
+        public void calculateWeight(){
+
+        }
+        public void addToCluster(LinkedList<point> cl, point ipt){
+            cl.AddLast(ipt);
         }
 
     }
@@ -57,9 +73,14 @@ namespace tryCluster{
                 CLlist.AddLast(new Cluster(ipt[i]));
             }
 
-            do {
+            //do {
 
-            }while();
+            //}while();
+
+        
+        }
+        public void mahalanobisDist(){
+
         }
 
     }
