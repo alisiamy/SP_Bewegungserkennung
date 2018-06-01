@@ -12,8 +12,6 @@ namespace tryCluster
         {
             //Console.WriteLine("Hello World!");
 
-
-
             tryCluster.point p = new tryCluster.point(3,4);
             tryCluster.point p2 = new tryCluster.point(4,9);
             tryCluster.point p3 = new tryCluster.point(3,18);
