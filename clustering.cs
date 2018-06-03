@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace tryCluster{
         class Cluster{
-
+        
         List<point> CL;
         point variance;
         point mean;
+		double covariance;
         public Cluster(point ipt){
             mean = ipt;
             addToCluster(CL, ipt);
@@ -38,10 +39,18 @@ namespace tryCluster{
                     counter++;
                     ++i;
                     }
-                variance.addition(point.substract(variance, mean));
+                //varianz
+				variance.addition(((point.substract(tmp, mean)).power(2.0)).mult(counter));
+        }
         }
 
-        }
+		private void calculateCV(){
+			covariance = 0;
+			for (int i = 0; i < CL.Count; ++i){
+				covariance += (CL[i].x - mean.x) * (CL[i].y - mean.y);
+			}
+			covariance /= CL.Count;
+         }
 
         public void addToCluster(List<point> cl, point ipt){ //umschreiben
             cl.Add(ipt);

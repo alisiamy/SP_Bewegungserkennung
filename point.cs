@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace tryCluster{
 public class point: IComparable<point>, IEquatable<point>{
-        private double x, y;
+        public double x, y; // sollte private sein
         public point(double px, double py){
             x = px;
             y = py;
@@ -26,6 +26,9 @@ public class point: IComparable<point>, IEquatable<point>{
         public point mult(int m){
             return new point(this.x *m,this.y *m);
         }
+		public point power(double n){
+			return new point(Math.Pow(this.x, n), Math.Pow(this.y, n));
+		}
         public int CompareTo(point comparepoint)
         {
             if (comparepoint == null){
