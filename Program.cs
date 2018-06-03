@@ -27,8 +27,8 @@ namespace tryCluster
 
             foreach(point n in pset){
                 Console.WriteLine("{0}", n.ToString());
-            }
 
+            }
         }
     }
 }
