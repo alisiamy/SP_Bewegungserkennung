@@ -12,6 +12,13 @@ public class point: IComparable<point>, IEquatable<point>{
             this.x += ipt.x;
             this.y += ipt.y;
         }
+        public void subtraction(point ipt){ // ???
+            this.x -= ipt.x;
+            this.y -= ipt.y;
+        }
+        public static point substract(point p1, point p2){
+            return new point(p1.x - p2.x, p1.y - p2.y);
+        }
         public void divide(int c){
             this.x /= c;
             this.y /= c;
