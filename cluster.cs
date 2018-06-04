@@ -4,13 +4,18 @@ using System.Collections.Generic;
 namespace tryCluster{     
  class Cluster{
         
-        static List<point> CL;
-        static point variance;
-        static point mean;
-		static double covariance;
+        private List<point> CL;
+        private point variance;
+        private point mean;
+		private double covariance;
         public Cluster(point ipt){
             mean = ipt;
             addToCluster(CL, ipt);
+        }
+
+        public point getMean()
+        {
+            return this.mean;
         }
         private void calculateEV(){
             mean = new point(0,0); // TODO: moegliche Optimierung
@@ -48,19 +53,19 @@ namespace tryCluster{
 			}
 			covariance /= CL.Count;
          }
-         public static double[] KVmatrixinverse(){
+         public double[] KVmatrixinverse(){
             double[] matrix = new double[4];
 
             double a = (1/CL.Count)*(variance.x-mean.x);
             double bc = (1/CL.Count)*covariance;
             double d = (1/CL.Count)*(variance.y-mean.y);
 
-            double divider = 1/(a*d - bc*bc);
+            double divider = a*d - bc*bc;
 
-             matrix[0] = divider*d;
-             matrix[1] = divider*(bc*(-1.0));  
+             matrix[0] = d/divider;
+             matrix[1] = -bc/divider;  
              matrix[2] = matrix[1];
-             matrix[3] = divider*a; 
+             matrix[3] = a/divider; 
 
              return matrix;
          }
