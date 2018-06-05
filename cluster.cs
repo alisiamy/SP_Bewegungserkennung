@@ -8,14 +8,23 @@ namespace tryCluster{
         private point variance;
         private point mean;
 		private double covariance;
+
         public Cluster(point ipt){
             mean = ipt;
+            CL = new List<point>();
             addToCluster(ipt);
         }
 
         public point getMean()
         {
             return this.mean;
+        }
+        public point getVariance(){
+            return this.variance;
+        }
+
+        public void clearCluster(){
+            CL.Clear();
         }
         private void calculateEV(){
             mean = new point(0,0); // TODO: moegliche Optimierung
