@@ -10,7 +10,7 @@ namespace tryCluster{
 		private double covariance;
         public Cluster(point ipt){
             mean = ipt;
-            addToCluster(CL, ipt);
+            addToCluster(ipt);
         }
 
         public point getMean()
@@ -53,7 +53,8 @@ namespace tryCluster{
 			}
 			covariance /= CL.Count;
          }
-         public double[] KVmatrixinverse(){
+         
+         private double[] KVmatrixinverse(){
             double[] matrix = new double[4];
 
             double a = (1/CL.Count)*(variance.x-mean.x);
@@ -70,8 +71,26 @@ namespace tryCluster{
              return matrix;
          }
 
-        public void addToCluster(List<point> cl, point ipt){ //umschreiben
-            cl.Add(ipt);
+         public void updateCluster(){
+             this.calculateEV();
+             this.calculateVariance(); 
+             this.calculateCV();
+             this.KVmatrixinverse();
+
+         }
+        public void addToCluster(point ipt){
+            CL.Add(ipt);
         }
+        //Mahalanobis distance between a point and a cluster
+        public double mahalanobisDist(point p){
+            double [] imx = this.KVmatrixinverse();
+ 
+            point tmp = p;
+            tmp.subtraction(this.getMean());
+            point p1im = new point(tmp.y*imx[0]+tmp.y*imx[1],tmp.x*imx[2]+tmp.x*imx[3]); // transpone
+            
+            return Math.Sqrt(tmp.x*p1im.x+tmp.y*p1im.y);
+        }
+
     }
 }
