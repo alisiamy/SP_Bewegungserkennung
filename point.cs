@@ -30,9 +30,19 @@ public class point: IComparable<point>, IEquatable<point>{
 			return new point(Math.Pow(this.x, n), Math.Pow(this.y, n));
 		}
 
-        public static point pround(point p){
-            return new point(Math.Round(p.x), Math.Round(p.y));
-        }
+        public bool pround(point old){
+                if(this.Equals(old)){
+                    return true;
+                }
+                if (Double.IsInfinity(this.x) || Double.IsNaN(old.x) || Double.IsInfinity(this.y) || Double.IsNaN(old.y)){
+                    return false;
+                }
+                if (Double.IsInfinity(old.x) || Double.IsNaN(this.x) || Double.IsInfinity(old.y) || Double.IsNaN(this.y)){
+                    return false;
+                }
+                 return Math.Abs(this.x - old.x) <= 0.000000001 && Math.Abs(this.y - old.y) <= 0.000000001;
+
+            }
         public int CompareTo(point comparepoint)
         {
             if (comparepoint == null){
