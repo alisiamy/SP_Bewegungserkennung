@@ -65,7 +65,7 @@ namespace tryCluster{
                 foreach(Cluster c in CLlist){
                     point oldMean = c.getMean();
                     c.updateCluster();
-                    change |= !oldMean.Equals(c.getMean());
+                    change = change || !point.pround(oldMean).Equals(point.pround(c.getMean()));
                 }
                 }while(change);
                 
