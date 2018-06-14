@@ -29,6 +29,10 @@ public class point: IComparable<point>, IEquatable<point>{
 		public point power(double n){
 			return new point(Math.Pow(this.x, n), Math.Pow(this.y, n));
 		}
+
+        public static point pround(point p){
+            return new point(Math.Round(p.x), Math.Round(p.y));
+        }
         public int CompareTo(point comparepoint)
         {
             if (comparepoint == null){
