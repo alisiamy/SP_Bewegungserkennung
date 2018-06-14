@@ -5,18 +5,18 @@ namespace tryCluster{
 
     class KMclustering{
         private int k; 
-        private List<Cluster> CLlist;  
+        private List<Cluster> CLlist;
+        private List<point> PList;  
         private point sigmaNull;
-        private List<point> PList;
 
-            public KMclustering(int k, List<point> pointL, point sNull){
+            public KMclustering(List<point> pl, int k, point sNull){
                 this.k = k;
-                this.PList = pointL;
                 this.sigmaNull = sNull;
+                this.PList = pl;
                 CLlist = new List<Cluster>();
         } 
         
-        public void clustering(point[] ipt){
+        public void clustering(){
 
             point maxVariance = new point(0,0);
 
@@ -26,13 +26,13 @@ namespace tryCluster{
                 HashSet <int> iSet = new HashSet<int>();
                 while(iSet.Count < k){
                 Random ran = new Random();
-                int idx = ran.Next(1,ipt.Length+1);
+                int idx = ran.Next(1,PList.Count);
                     if(!iSet.Contains(idx)){
                         iSet.Add(idx);
                     }
                 }
                 foreach(int i in iSet){
-                    CLlist.Add(new Cluster(ipt[i]));
+                    CLlist.Add(new Cluster(PList[i]));
                     CLlist[CLlist.Count-1].updateCluster();
                 }
 
@@ -46,7 +46,7 @@ namespace tryCluster{
 
                     change = false;
 
-                    foreach(point p in ipt){
+                    foreach(point p in PList){
 
                         double minDist = CLlist[0].mahalanobisDist(p);
                         int DistX = 0;

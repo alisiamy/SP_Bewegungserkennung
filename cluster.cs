@@ -6,8 +6,9 @@ namespace tryCluster{
         
         private List<point> CL;
         private point variance;
-        private point mean;
+        private point mean; // distance treshold
 		private double covariance;
+        private double[] ikvm;
 
         public Cluster(point ipt){
             mean = ipt;
@@ -33,7 +34,7 @@ namespace tryCluster{
                 point tmp = CL[i];
                 int counter = 1;
                 // heufigkeit
-                    while(i+1 <= CL.Count && CL[i+1]==tmp){ 
+                    while(i+1 < CL.Count && CL[i+1]==tmp){ 
                     counter++;
                     ++i;
                     }
@@ -47,7 +48,7 @@ namespace tryCluster{
                 point tmp = CL[i];
                 int counter = 1;
                      // heufigkeit
-                    while(i+1 <= CL.Count && CL[i+1]==tmp){ 
+                    while(i+1 < CL.Count && CL[i+1]==tmp){ 
                     counter++;
                     ++i;
                     }
@@ -63,8 +64,8 @@ namespace tryCluster{
 			covariance /= CL.Count;
          }
          
-         private double[] KVmatrixinverse(){
-            double[] matrix = new double[4];
+         private void KVmatrixinverse(){
+            this.ikvm = new double[4];
 
             double a = (1/CL.Count)*(variance.x-mean.x);
             double bc = (1/CL.Count)*covariance;
@@ -72,12 +73,11 @@ namespace tryCluster{
 
             double divider = a*d - bc*bc;
 
-             matrix[0] = d/divider;
-             matrix[1] = -bc/divider;  
-             matrix[2] = matrix[1];
-             matrix[3] = a/divider; 
+             this.ikvm[0] = d/divider;
+             this.ikvm[1] = -bc/divider;  
+             this.ikvm[2] = this.ikvm[1];
+             this.ikvm[3] = a/divider; 
 
-             return matrix;
          }
 
          public void updateCluster(){
@@ -92,7 +92,7 @@ namespace tryCluster{
         }
         //Mahalanobis distance between a point and a cluster
         public double mahalanobisDist(point p){
-            double [] imx = this.KVmatrixinverse();
+            double [] imx = ikvm;
  
             point tmp = p;
             tmp.subtraction(this.getMean());
