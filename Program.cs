@@ -10,10 +10,14 @@ namespace Bewegungserkennung
     {
         static void Main(string[] args)
         {
-            dataReader d = new dataReader("D:/VL/swGesten/KinectDaten_Pascal.csv");
+            dataReader d = new dataReader("C:/Users/Asus/Documents/VS Code/Softwareprojekt/data/KinectDaten_Pascal.csv");
             List<Shape> shapes = d.readData();
-            KMclustering k = new KMclustering(shapes[1], new point(100,10),2,1);
+            int shapeNumber = 1;
+            KMclustering k = new KMclustering(shapes[shapeNumber], new point(100,10),2,1);
             k.clustering();
+
+            //zeitliche Information
+            FSM stateMachine = new FSM(k, shapes[shapeNumber]);
         }
     }
 }

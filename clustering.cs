@@ -32,6 +32,14 @@ namespace Bewegungserkennung
             }
         } 
 
+        public int numberClusters() {
+            return k;
+        }
+
+        public List<Cluster> getClusterList() {
+            return CLlist;
+        }
+
         private point maxVariance()
         {
             point maxVariance = new point(0,0);

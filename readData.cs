@@ -33,7 +33,17 @@ namespace Bewegungserkennung
             foreach (string line in File.ReadLines(file))
             {
                 string[] properties = line.Trim().Split(';');
-                int shapeID = Int32.Parse(properties[(int)LineFormat.ShapeID]);
+                int shapeID = 0;
+                
+                try {
+                    shapeID = Int32.Parse(properties[(int)LineFormat.ShapeID]);
+                }
+                catch {
+                    Console.WriteLine("Konnte Zeile nicht einlesen ");
+                    continue;
+                }
+
+                //int shapeID = Int32.Parse(properties[(int)LineFormat.ShapeID]);
 
                 if (shapes.ContainsKey(shapeID))
                 {
@@ -44,8 +54,9 @@ namespace Bewegungserkennung
                     if (s.ContainsGesture(gestureID))
                     {
                         Gesture g = s.getGesture(gestureID);
-                        g.Add(new point(Double.Parse(properties[(int)LineFormat.X], System.Globalization.CultureInfo.InstalledUICulture),
-                                        Double.Parse(properties[(int)LineFormat.Y], System.Globalization.CultureInfo.InstalledUICulture)));
+                        int mult = 10000000;
+                        g.Add(new point(Double.Parse(properties[(int)LineFormat.X], System.Globalization.CultureInfo.InstalledUICulture) * mult,
+                                        Double.Parse(properties[(int)LineFormat.Y], System.Globalization.CultureInfo.InstalledUICulture)* mult));
                     }
                     else
                     {

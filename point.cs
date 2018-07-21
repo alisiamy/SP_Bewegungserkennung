@@ -76,6 +76,7 @@ namespace Bewegungserkennung
         
         public int CompareTo(point comparepoint)
         {
+            //returns 0 if points ar equal, else 1
             if (comparepoint == null)
                 return 1;
 

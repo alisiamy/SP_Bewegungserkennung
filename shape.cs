@@ -40,5 +40,9 @@ namespace Bewegungserkennung
         {
             return gestures.ContainsKey(gestureID);
         }
+
+        public int numberGestures() {
+            return gestures.Count;
+        }
     }
 }
