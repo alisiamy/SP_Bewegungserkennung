@@ -8,8 +8,8 @@ namespace Bewegungserkennung
 
     class KMclustering
     {
-        private int k;
-        private List<Cluster> CLlist;
+        public int k {get; private set; }
+        public List<Cluster> CLlist {get; private set;}
         private List<point> PList;  
         private point sigmaNull;
         private double epsilon;
@@ -61,13 +61,13 @@ namespace Bewegungserkennung
                     foreach(point p in PList){
 
                         //sometimes the mahalanobis distance becomes NaN, why is that?
-                        double minDist = CLlist[0].mahalanobisDist(p);
+                        double minDist = CLlist[0].euclideanDist(p);
                         Debug.Assert(!Double.IsNaN(minDist));
                         int DistX = 0;
 
                         for(int j = 1; j < CLlist.Count; ++j)
                         {
-                            double tmpDist = CLlist[j].mahalanobisDist(p);
+                            double tmpDist = CLlist[j].euclideanDist(p);
                             Debug.Assert(!Double.IsNaN(tmpDist));
                             
                             if(tmpDist < minDist)

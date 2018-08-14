@@ -89,9 +89,9 @@ namespace Bewegungserkennung
         public void updateCluster()
         {
              this.calculateEV();
-             this.calculateVariance(); 
-             this.calculateCV();
-             this.KVmatrixinverse();
+             this.calculateVariance();
+             //this.calculateCV();
+             //this.KVmatrixinverse();
 
         }
 
@@ -106,6 +106,10 @@ namespace Bewegungserkennung
             CL.RemoveRange(0,CL.Count/2);
             updateCluster();
             return other;
+        }
+
+        public double euclideanDist(point p){
+            return mean.distance(p);
         }
 
         //Mahalanobis distance between a point and a cluster

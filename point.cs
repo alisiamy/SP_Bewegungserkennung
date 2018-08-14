@@ -9,16 +9,27 @@ namespace Bewegungserkennung
     {
         public double x {get; private set;}
         public double y {get; private set;} // sollte private sein
+        public long time {get; private set;}
+
         public point(double px, double py)
         {
             x = px;
             y = py;
+            time = 0;
         }
 
         public point(point p)
         {
             x = p.x;
             y = p.y;
+            time = p.time;
+        }
+
+        public point(double px, double py, long t){
+            x = px;
+            y = py;
+            time = t;
+
         }
 
         public void addition(point ipt)
@@ -53,6 +64,10 @@ namespace Bewegungserkennung
 			return new point(Math.Pow(this.x, n), Math.Pow(this.y, n));
 		}
 
+        public point sqroot(){
+            return new point(Math.Sqrt(this.x),Math.Sqrt(this.y));
+        }
+
         public bool pround(point old)
         {
                 if(this.Equals(old))
@@ -74,6 +89,11 @@ namespace Bewegungserkennung
             this.y = Math.Abs(this.y);
         }
         
+        public static point abs(point p)
+        {
+            return new point(Math.Abs(p.x),Math.Abs(p.y));
+        }
+
         public int CompareTo(point comparepoint)
         {
             if (comparepoint == null)
@@ -101,6 +121,17 @@ namespace Bewegungserkennung
         public override String ToString()
         {
             return "("+this.x.ToString()+","+this.y.ToString()+")";
+        }
+    }
+
+    public class pointComparer : IComparer<point>{
+        public int Compare(point p1, point p2){
+            if(p1.time > p2.time)
+                return 1;
+            else if(p1.time < p2.time)
+                return -1;
+            else
+                return 0;
         }
     }
 }
