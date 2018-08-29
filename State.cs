@@ -1,11 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+
 
 namespace Bewegungserkennung {
+
+    [DataContract]
     class State {
+        [DataMember]
         private point center;
-        private point treshold; //double treshold;
+        [DataMember]
+        private point treshold; 
+        [DataMember]
         public int tMin{get; private set;}
+        [DataMember]
         public int tMax{get; private set;}
         public State(Cluster c, int k, Shape s) {
             center = c.mean;

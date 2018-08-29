@@ -21,6 +21,7 @@ namespace Bewegungserkennung
     {
         string file;
         private Dictionary<int,Shape> shapes;
+        const long FRAME = 30; 
 
         public dataReader(string file)
         {
@@ -45,7 +46,8 @@ namespace Bewegungserkennung
                     {
                         Gesture g = s.getGesture(gestureID);
                         g.Add(new point(Double.Parse(properties[(int)LineFormat.X], System.Globalization.CultureInfo.InstalledUICulture),
-                                        Double.Parse(properties[(int)LineFormat.Y], System.Globalization.CultureInfo.InstalledUICulture)));
+                                        Double.Parse(properties[(int)LineFormat.Y], System.Globalization.CultureInfo.InstalledUICulture),
+                                        Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME));
                     }
                     else
                     {
@@ -53,7 +55,8 @@ namespace Bewegungserkennung
                                     new List<point>(){new point(Double.Parse(properties[(int)LineFormat.X],
                                                                     System.Globalization.CultureInfo.InstalledUICulture),
                                                                 Double.Parse(properties[(int)LineFormat.Y],
-                                                                    System.Globalization.CultureInfo.InstalledUICulture))}));
+                                                                    System.Globalization.CultureInfo.InstalledUICulture),
+                                                                    Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME)}));
                     }
                 }
                 else
@@ -62,7 +65,8 @@ namespace Bewegungserkennung
                                     new List<point>(){new point(Double.Parse(properties[(int)LineFormat.X],
                                                                     System.Globalization.CultureInfo.InstalledUICulture),
                                                                 Double.Parse(properties[(int)LineFormat.Y],
-                                                                    System.Globalization.CultureInfo.InstalledUICulture))})));
+                                                                    System.Globalization.CultureInfo.InstalledUICulture),
+                                                                    Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME)})));
                 }
             }
             return shapes.Values.ToList();

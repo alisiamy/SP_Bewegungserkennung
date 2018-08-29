@@ -31,6 +31,11 @@ namespace Bewegungserkennung
             return g;
         }
 
+        public List<int> getIDList(){
+
+            return gestures.Keys.ToList();
+        }
+
         public List<Gesture> getGestures() 
         {
             return gestures.Values.ToList();
