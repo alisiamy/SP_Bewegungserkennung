@@ -12,19 +12,20 @@ namespace Bewegungserkennung
         {
             dataReader d = new dataReader("KinectDaten_Pascal.csv");
             List<Shape> shapes = d.readData();
+            d.modifyShapes(shapes);
 
-            KMclustering km = new KMclustering(shapes[1], new point(1.0e+17,1.0e+17),2,0.1);
+            KMclustering km = new KMclustering(shapes[1], new point(1.0e+15,1.0e+15),2,0.1);
             km.clustering();
 
             int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(1.0e+17)));
             FSM machine = new FSM(km, shapes[1], k);
 
-            FSM.serialize(machine, "testMachine.xml");
-            FSM f2 = FSM.deserialize("testMachine.xml");
+            //FSM.serialize(machine, "testMachine.xml");
+            //FSM f2 = FSM.deserialize("testMachine.xml");
 
             foreach(Gesture g in shapes[1].getGestures()){
             machine.recognize(g);
-            //Console.WriteLine("done");
+            Console.WriteLine("done");
             }
 
             return;

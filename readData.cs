@@ -83,6 +83,23 @@ namespace Bewegungserkennung
         {
             return shapes.Values.ToList();
         }
+
+        public void modifyShapes(List<Shape> shapelist){
+
+            foreach(Shape s in shapelist){
+                point nullpoint = s.getGestures()[0].Points[0];
+                List<Gesture> glist = s.getGestures();
+                for(int i = 1; i < glist.Count; ++i){
+                    point firstpoint = glist[i].Points[0];
+                    foreach(point p in glist[i].Points){
+                        p.addition(point.substract(nullpoint,firstpoint));
+                    }
+                }            
+            }
+
+        
+        }
+    
     }
 
 }
