@@ -7,7 +7,7 @@ namespace Bewegungserkennung
 
     public class Gesture 
     {
-        public List<point> Points {get; private set; }
+        public List<point> Points {get; set; }
         public int gestureID {get; private set; }
 
         public Gesture(int gestureID, List<point> p)

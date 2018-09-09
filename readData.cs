@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Globalization;
 
 
 namespace Bewegungserkennung 
@@ -14,7 +15,7 @@ namespace Bewegungserkennung
         FrameID;X;Y;Z;GestureID;SqlTime;Alpha;Beta;Velocity;ShapeId;UID
     */
 
-    enum LineFormat {FrameID,X,Y,Z,GestureID,SqlTime,Alpha,Beta,Velocity,ShapeID,UID};
+   enum LineFormat {FrameID,Y,X,Z,GestureID,SqlTime,Alpha,Beta,Velocity,ShapeID,UID};
 
     //TODO: file validity checking and exception handling
     public class dataReader 
@@ -45,17 +46,17 @@ namespace Bewegungserkennung
                     if (s.ContainsGesture(gestureID))
                     {
                         Gesture g = s.getGesture(gestureID);
-                        g.Add(new point(Double.Parse(properties[(int)LineFormat.X], System.Globalization.CultureInfo.InstalledUICulture),
-                                        Double.Parse(properties[(int)LineFormat.Y], System.Globalization.CultureInfo.InstalledUICulture),
-                                        Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME));
+                        g.Add(new point(Double.Parse(properties[(int)LineFormat.X], CultureInfo.GetCultureInfo("de-DE")),
+                                        Double.Parse(properties[(int)LineFormat.Y], CultureInfo.GetCultureInfo("de-DE")),
+                                         Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME));
                     }
                     else
                     {
                         s.Add(gestureID,new Gesture(gestureID,
                                     new List<point>(){new point(Double.Parse(properties[(int)LineFormat.X],
-                                                                    System.Globalization.CultureInfo.InstalledUICulture),
+                                                                    CultureInfo.GetCultureInfo("de-DE")),
                                                                 Double.Parse(properties[(int)LineFormat.Y],
-                                                                    System.Globalization.CultureInfo.InstalledUICulture),
+                                                                    CultureInfo.GetCultureInfo("de-DE")),
                                                                     Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME)}));
                     }
                 }
@@ -63,9 +64,9 @@ namespace Bewegungserkennung
                 {
                     shapes.Add(shapeID,new Shape(shapeID,new Gesture(Int32.Parse(properties[(int)LineFormat.GestureID]),
                                     new List<point>(){new point(Double.Parse(properties[(int)LineFormat.X],
-                                                                    System.Globalization.CultureInfo.InstalledUICulture),
+                                                                    CultureInfo.GetCultureInfo("de-DE")),
                                                                 Double.Parse(properties[(int)LineFormat.Y],
-                                                                    System.Globalization.CultureInfo.InstalledUICulture),
+                                                                    CultureInfo.GetCultureInfo("de-DE")),
                                                                     Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME)})));
                 }
             }
@@ -85,16 +86,17 @@ namespace Bewegungserkennung
         }
 
         public void modifyShapes(List<Shape> shapelist){
-
+            //verschieben
             foreach(Shape s in shapelist){
-                point nullpoint = s.getGestures()[0].Points[0];
                 List<Gesture> glist = s.getGestures();
-                for(int i = 1; i < glist.Count; ++i){
-                    point firstpoint = glist[i].Points[0];
-                    foreach(point p in glist[i].Points){
-                        p.addition(point.substract(nullpoint,firstpoint));
-                    }
-                }            
+                for(int i = 0; i < glist.Count; ++i){
+                   
+                    point diff = point.substract(new point(0,0),glist[i].Points[0]);
+                    for (int j=0;j<glist[i].Points.Count;++j)
+                        glist[i].Points[j].addition(diff);
+                }
+            //skalieren  
+                         
             }
 
         
