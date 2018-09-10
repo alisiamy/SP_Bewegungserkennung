@@ -1,85 +1,106 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace tryCluster{     
 
-    class KMclustering{
-        private int k; 
-        private List<Cluster> CLlist;
+namespace Bewegungserkennung
+{     
+
+    class KMclustering
+    {
+        public int k {get; private set; }
+        public List<Cluster> CLlist {get; private set;}
         private List<point> PList;  
         private point sigmaNull;
+        private double epsilon;
 
-            public KMclustering(List<point> pl, int k, point sNull){
-                this.k = k;
-                this.sigmaNull = sNull;
-                this.PList = pl;
-                CLlist = new List<Cluster>();
+        public KMclustering(Shape s, point sNull, int k=2, double epsilon = 0.5)
+        {
+            this.k = k;
+            this.sigmaNull = sNull;
+            this.epsilon = epsilon;
+
+            PList = new List<point>(); 
+            
+            foreach(Gesture g in s.getGestures())
+                PList.AddRange(g.Points);
+
+            CLlist = new List<Cluster>();
+            for (int i = 0; i < k; ++i)
+            {
+                CLlist.Add(new Cluster(PList.GetRange(i*PList.Count/k, Math.Min(PList.Count/k, PList.Count - i*PList.Count/k)))); 
+            }
         } 
-        
-        public void clustering(){
 
+        private point maxVariance()
+        {
             point maxVariance = new point(0,0);
+            foreach (Cluster c in CLlist)
+            {
+                if (c.variance.CompareTo(maxVariance) > 0)
+                    maxVariance = c.variance;
+            }
+            return maxVariance;
+        }
+        
+        public void clustering()
+        {
+
+            point curVariance = maxVariance();
 
             do{
-                // Initial centroids for clusters according to k
-
-                HashSet <int> iSet = new HashSet<int>();
-                while(iSet.Count < k){
-                Random ran = new Random();
-                int idx = ran.Next(1,PList.Count);
-                    if(!iSet.Contains(idx)){
-                        iSet.Add(idx);
-                    }
-                }
-                foreach(int i in iSet){
-                    CLlist.Add(new Cluster(PList[i]));
-                    CLlist[CLlist.Count-1].updateCluster();
-                }
-
                 bool change;
-
+                //k-means
                 do {
-
                     foreach(Cluster c in CLlist){
-                    c.clearCluster();
+                        c.clearCluster();
                     }
 
                     change = false;
 
                     foreach(point p in PList){
 
-                        double minDist = CLlist[0].mahalanobisDist(p);
+                        //sometimes the mahalanobis distance becomes NaN, why is that?
+                        double minDist = CLlist[0].euclideanDist(p);
+                        Debug.Assert(!Double.IsNaN(minDist));
                         int DistX = 0;
 
-                        for(int j = 1; j < CLlist.Count; ++j){
-
-                            double tmpDist = CLlist[j].mahalanobisDist(p);
-
-                            if(tmpDist < minDist){
+                        for(int j = 1; j < CLlist.Count; ++j)
+                        {
+                            double tmpDist = CLlist[j].euclideanDist(p);
+                            Debug.Assert(!Double.IsNaN(tmpDist));
+                            
+                            if(tmpDist < minDist)
+                            {
                                 minDist = tmpDist;
                                 DistX = j;
                             }
                         }
-                    CLlist[DistX].addToCluster(p);
+                        CLlist[DistX].addToCluster(p);
                     }
-                foreach(Cluster c in CLlist){
-                    point oldMean = c.getMean();
-                    c.updateCluster();
-                    change = change || c.getMean().pround(oldMean);
-                }
+
+                    foreach(Cluster c in CLlist)
+                    {
+                        //Debug.Assert(c.getPoints().Count > 0);
+                        point oldMean = new point(c.mean);
+                        c.updateCluster();
+                        change |= !(c.mean.distance(oldMean) < epsilon);
+                    }
                 }while(change);
                 
-                k++;
+                curVariance = maxVariance();
 
-                foreach(Cluster c in CLlist){
-
-                    if(c.getVariance().CompareTo(maxVariance)>0){
-                        maxVariance = c.getVariance();
-                    }
+                if (sigmaNull.CompareTo(curVariance) < 0)
+                {
+                    k++;
+                    int i=0;
+                    while(!CLlist[i].variance.Equals(curVariance))
+                        ++i;
+                    
+                    CLlist.Add(CLlist[i].split());
                 }
 
-            }while(sigmaNull.CompareTo(maxVariance)<0);
+            } while(sigmaNull.CompareTo(curVariance)<0);
         }
-
     }
-    }
+}
