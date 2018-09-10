@@ -10,7 +10,7 @@ namespace Bewegungserkennung
     public class Shape 
     {
         private Dictionary<int,Gesture> gestures;
-        private int shapeID;
+        public int shapeID {get; private set; }
 
         public Shape(int shapeID, Gesture g) 
         {
