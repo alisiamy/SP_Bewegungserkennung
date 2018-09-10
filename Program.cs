@@ -12,7 +12,6 @@ namespace Bewegungserkennung
         {
             dataReader d = new dataReader("KinectDaten_Pascal.csv");
             List<Shape> shapes = d.readData();
-            d.modifyShapes(shapes);
 
             KMclustering km = new KMclustering(shapes[5], new point(500,500),2,0.1);            
             km.clustering();
