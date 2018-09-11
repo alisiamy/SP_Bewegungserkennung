@@ -10,26 +10,18 @@ namespace Bewegungserkennung
     public class Shape 
     {
         private Dictionary<int,Gesture> gestures;
-        private int shapeID;
-        public List<int> gestureIDList= new List<int>();
+        public int shapeID {get; private set; }
 
         public Shape(int shapeID, Gesture g) 
         {
             this.shapeID = shapeID;
             this.gestures = new Dictionary<int,Gesture>();
             this.gestures.Add(g.gestureID,g);
-            gestureIDList.Add(g.gestureID);
         }
 
         public void Add(int gestureID, Gesture newGesture) 
-        { 
+        {
             gestures.Add(gestureID, newGesture);
-            gestureIDList.Add(gestureID);
-        }
-
-        public bool removeGesture(int gestureID) { //for testing
-            if(!this.ContainsGesture(gestureID)) return false;
-            return this.gestures.Remove(gestureID);
         }
 
         public Gesture getGesture(int gestureID)
@@ -37,6 +29,11 @@ namespace Bewegungserkennung
             Gesture g;
             gestures.TryGetValue(gestureID, out g);
             return g;
+        }
+
+        public List<int> getIDList(){
+
+            return gestures.Keys.ToList();
         }
 
         public List<Gesture> getGestures() 
@@ -47,10 +44,6 @@ namespace Bewegungserkennung
         public bool ContainsGesture(int gestureID)
         {
             return gestures.ContainsKey(gestureID);
-        }
-
-        public int getShapeID() {
-            return shapeID;
         }
     }
 }

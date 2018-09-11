@@ -1,40 +1,27 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Xml;
+using System.IO;
 
 namespace Bewegungserkennung {
+
+[DataContract]
 class FSM {
-        List<State> stateList;
-        int currentState = 0;
-        int currentStatePointCount = 0;
-        
+        [DataMember]
+        private List<State> stateList;
+        private int currentState = 0;
+        private int time = 0;
+
+         public enum Status{
+            RECOGNIZED,
+            FAILED,
+            RECOGNIZING
+            }       
 
         public FSM(KMclustering cl, Shape s, int k) {
             stateList = clusterToState(orderClusters(cl.CLlist,s),k, s);            
-        }
-
-        //for gesture recognition
-        public Boolean tick(point livePoint) {
-        if(currentState == -2)  return false; //"FSM is eliminated from consideration"
-
-            if(this.stateList[currentState+1].pointInState(livePoint)) {
-                if(currentStatePointCount > stateList[currentState].tMax) {
-                    currentState++;
-                } else if(stateList[currentState].distance(livePoint) < 
-                            stateList[currentState].distance(livePoint) &&
-                            currentStatePointCount > stateList[currentState].tMin) {
-                                currentState++;
-                } else if(!this.stateList[currentState].pointInState(livePoint)) {
-                    currentState++;
-                }
-            }
-            else { //"FSM is eliminated from consideration"
-                currentState = -2;
-            }
-
-            if(currentState == stateList.Count-1) return true;
-
-            return false;
         }
 
         private List<Cluster> orderClusters(List<Cluster> CList, Shape s)
@@ -68,7 +55,6 @@ class FSM {
                         ++voting[l[i]];
                     }
                     catch(System.ArgumentOutOfRangeException e){
-                        Console.WriteLine("hier");
                     };
                 }
                 int maxIdx = 0;
@@ -91,5 +77,98 @@ class FSM {
             }
             return result;
         }
-    }
+
+        //serialization
+
+        public static void serialize(FSM f, string filepath){
+
+            DataContractSerializer ser = new DataContractSerializer(typeof(FSM));
+            using(FileStream fs = File.Create(filepath)){
+            using(XmlWriter xw = XmlWriter.Create(fs)){
+                ser.WriteObject(xw, f);
+            }
+            }
+        }
+
+        public static FSM deserialize(string filepath){
+
+            DataContractSerializer ser = new DataContractSerializer(typeof(FSM));
+
+            using(FileStream fs = new FileStream(filepath, FileMode.Open)){
+
+                XmlDictionaryReader dr = XmlDictionaryReader.CreateTextReader(fs,  new XmlDictionaryReaderQuotas());
+                FSM f = (FSM)ser.ReadObject(dr, true);
+                return f;
+            }
+        } 
+
+
+        //for gesture recognition
+        public FSM.Status tick(point livePoint) {
+            if(currentState == stateList.Count-1){
+                Console.WriteLine("Gesture is recognized");
+
+                return Status.RECOGNIZED;
+                
+            }
+            if(!stateList[currentState].pointInState(livePoint) && currentState == 0 && time == 0){ //FSM ist nicht aktiviert
+
+                return Status.FAILED;
+            }else if(stateList[currentState].pointInState(livePoint)){
+                if (time>= stateList[currentState].tMin && time<= stateList[currentState].tMax){ //point ist im State
+                     
+                    return Status.RECOGNIZING;
+                }else if( time> stateList[currentState].tMax){ //Zeit wird ueberschritten
+
+                    currentState = 0;
+                    time = 1;
+                    return Status.FAILED;
+                }else{                                         //if( time< stateList[currentState].tMin)
+
+                    time++;
+                    return Status.FAILED;
+                }
+            }else if(stateList[currentState+1].pointInState(livePoint)){ // point befindet sich im naechsten State
+                if(time>= stateList[currentState].tMin && time<= stateList[currentState].tMax){
+
+                    currentState++;
+                    time = 1;
+                    return Status.RECOGNIZING;
+                }else if(time> stateList[currentState].tMax) {
+
+                    currentState = 0;
+                    time = 0;
+                    return Status.FAILED;
+                }else {                                          //if(time< stateList[currentState].tMin)
+
+                    currentState = 0;
+                    time = 0;
+                    return Status.FAILED;
+                }
+            }else{
+
+                return Status.FAILED;
+            }
+
+        }
+
+        public void reset(){
+            currentState =0;
+            time = 0;
+        }
+
+        public bool recognize(Gesture g){
+
+            Status s = Status.FAILED;
+
+                foreach(point p in g.Points){
+                     s = tick(p);
+                }
+
+            reset();
+
+            return s == Status.RECOGNIZED;
+        }
+
+}
 }

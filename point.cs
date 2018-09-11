@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
-
+using System.Runtime.Serialization;
 
 namespace Bewegungserkennung 
 {
-
+    [DataContract]
     public class point: IComparable<point>, IEquatable<point>
     {
+        [DataMember]
         public double x {get; private set;}
+        [DataMember]
         public double y {get; private set;} // sollte private sein
+        [DataMember]
         public long time {get; private set;}
 
         public point(double px, double py)

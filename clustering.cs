@@ -31,7 +31,7 @@ namespace Bewegungserkennung
                 CLlist.Add(new Cluster(PList.GetRange(i*PList.Count/k, Math.Min(PList.Count/k, PList.Count - i*PList.Count/k)))); 
             }
         } 
-
+ 
         private point maxVariance()
         {
             point maxVariance = new point(0,0);

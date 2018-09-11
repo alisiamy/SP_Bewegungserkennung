@@ -14,6 +14,11 @@ namespace Bewegungserkennung
 		private double covariance;
         private double[] ikvm;
 
+        public Cluster(point var, point me) { //for testing
+            variance = var;
+            mean = me;
+        }
+
         public Cluster(point ipt)
         {
             mean = ipt;
