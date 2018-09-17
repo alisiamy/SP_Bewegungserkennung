@@ -7,7 +7,7 @@ namespace Bewegungserkennung
 {
     class Program
     {
-        private static int shapeNumber = 2;
+        private static int shapeNumber = 2; //max 22
 
         static void Main(string[] args)
         {
@@ -19,9 +19,10 @@ namespace Bewegungserkennung
 
             //SWPvisualization.visualizeShape(shapes[shapeNumber], new List<Cluster>());
 
-            
+
             //int shapeNumber = 4;
-            KMclustering km = new KMclustering(shapes[shapeNumber], new point(1000,1000),2,0.001);            
+            double variance = 50;
+            KMclustering km = new KMclustering(shapes[shapeNumber], new point(variance,variance),2,0.001);            
             km.clustering();
 
             //km.CLlist.Add(new Cluster(new point(3, 3), new point(15, 15)));       //for testing

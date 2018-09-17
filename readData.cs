@@ -86,6 +86,7 @@ namespace Bewegungserkennung
             return shapes.Values.ToList();
         }
 
+        //Scales all Gestures of one shape to fit in the range 1 to 100
         public List<Shape> scaleShapes(List<Shape> shapeList) {
             scaleDic = new Dictionary<int, Shape>();
 
@@ -148,5 +149,10 @@ namespace Bewegungserkennung
 
             return scaleDic.Values.ToList();
         }
+
+        public List<Shape> scaleGesture(List<Shape> shapeList) {
+
+        }
+
     }
 }

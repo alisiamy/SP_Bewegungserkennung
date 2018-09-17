@@ -44,30 +44,8 @@ namespace Bewegungserkennung
             // Create a canvas sized to fill the window
             Canvas myCanvas = new Canvas();
 
-            int i = 0;
 
-            foreach (Gesture g in s.getGestures()) {
-                List<point> points = g.Points;
-                 foreach (point p in points) {
-                    Rectangle myRect = new Rectangle();
-                    myRect.Stroke = Brushes.Black;
-                    myRect.HorizontalAlignment = HorizontalAlignment.Left;
-                    myRect.VerticalAlignment = VerticalAlignment.Bottom;
-                    myRect.Fill = Brushes.SkyBlue;
-                    myRect.Height = rectSize;
-                    myRect.Width = rectSize;
-                    myCanvas.Children.Add(myRect);
-                    Canvas.SetBottom(myRect, p.y * scale);
-                    Canvas.SetLeft(myRect, p.x * scale);
-                    //Canvas.SetTop(myRect, windowSize - p.y * rectSize - 30);
-                    //Canvas.SetLeft(myRect, p.x * rectSize);
-                    if (i < 15) Console.WriteLine(p.x + "; " + p.y);
-
-                    i++;
-                }
-
-            }
-
+            //Clustervisualization
             if (clusterList.Count != 0) {
                 foreach (Cluster c in clusterList) {
                     point threshold = c.variance.sqroot().mult(clusterList.Count); //radius
@@ -76,22 +54,33 @@ namespace Bewegungserkennung
                     Ellipse myEllipse = new Ellipse();
                     myEllipse.Stroke = System.Windows.Media.Brushes.Black;
                     myEllipse.Fill = System.Windows.Media.Brushes.DarkBlue;
-                    //myEllipse.HorizontalAlignment = HorizontalAlignment.Center;
-                    //myEllipse.VerticalAlignment = VerticalAlignment.Center;
-                    myEllipse.HorizontalAlignment = HorizontalAlignment.Left;
-                    myEllipse.VerticalAlignment = VerticalAlignment.Bottom;
-                    myEllipse.Width = threshold.x * scale;
-                    myEllipse.Height = threshold.y * scale;
+                    myEllipse.HorizontalAlignment = HorizontalAlignment.Center;
+                    myEllipse.VerticalAlignment = VerticalAlignment.Center;
+                    myEllipse.Width = threshold.x * scale / 2; myEllipse.Height =  threshold.y * scale / 2; //richtige grösse
+                    //myEllipse.Width = 30; myEllipse.Height = 30; //nur zentren visualisieren
                     myCanvas.Children.Add(myEllipse);
-                    Canvas.SetBottom(myEllipse, center.x * scale);
-                    Canvas.SetLeft(myEllipse, center.x * scale);
-
-
-                    /*
-                     public bool pointInState(point p){
-                        return point.abs(point.substract(center,p)).CompareTo(treshold) <= 0;
-                     } */
+                    Canvas.SetBottom(myEllipse, center.y * scale - myEllipse.Height/2 + 20);
+                    Canvas.SetLeft(myEllipse, center.x * scale - myEllipse.Width/2 + 40);
                 }
+            }
+
+
+            //Visualization of the points
+            foreach (Gesture g in s.getGestures()) {
+                List<point> points = g.Points;
+                foreach (point p in points) {
+                    Rectangle myRect = new Rectangle();
+                    myRect.Stroke = Brushes.Black;
+                    myRect.HorizontalAlignment = HorizontalAlignment.Left;
+                    myRect.VerticalAlignment = VerticalAlignment.Bottom;
+                    myRect.Fill = Brushes.SkyBlue;
+                    myRect.Height = rectSize;
+                    myRect.Width = rectSize;
+                    myCanvas.Children.Add(myRect);
+                    Canvas.SetBottom(myRect, p.y * scale + 20);
+                    Canvas.SetLeft(myRect, p.x * scale + 40);
+                }
+
             }
 
             mainWindow.Content = myCanvas;
