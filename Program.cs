@@ -29,7 +29,7 @@ namespace Bewegungserkennung
 
             //Visualisierung
             //new List<Cluster>();
-            SWPvisualization.visualizeShape(shapes[shapeNumber], km.CLlist);
+            SWPvisualization.visualizeShape2(shapes[shapeNumber], km.CLlist);
             Console.WriteLine(km.CLlist.Count);
 
             int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(10)));

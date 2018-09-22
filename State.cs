@@ -22,7 +22,10 @@ namespace Bewegungserkennung {
         }
 
         public bool pointInState(point p){
-            return point.abs(point.substract(center,p)).CompareTo(treshold) <= 0;
+            point normalized = new point(p.x - center.x, p.y - center.y);
+
+            return ((double)(normalized.x * normalized.x) / (treshold.x * treshold.x)) +
+                ((double)(normalized.y * normalized.y) / (treshold.y * treshold.y)) <= 1.0;
         }
         private void calculateTMinMax(Cluster c, Shape s){
             tMin = Int32.MaxValue;
