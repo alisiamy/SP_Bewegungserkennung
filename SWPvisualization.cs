@@ -38,6 +38,7 @@ namespace Bewegungserkennung
             visThread = new Thread(new ThreadStart(() => visualizeShapeThread2(s, clusterList))); //lambda expression to start thread with parameter
             visThread.SetApartmentState(ApartmentState.STA);
             visThread.Start();
+            visThread.Join();
         }
 
         private static void visualizeShapeThread2(Shape s, List<Cluster> clusterList) {
@@ -109,6 +110,8 @@ namespace Bewegungserkennung
             //Thread.Sleep(2000);
 
             Console.ReadLine();
+
+            mainWindow.Close();
         }
 
         private static bool pointInCluster(point p, point center, point treshold) {
@@ -212,6 +215,8 @@ namespace Bewegungserkennung
             //Thread.Sleep(2000);
 
             Console.ReadLine();
+
+            mainWindow.Close();
         }
 
         private static void visualizeGestureThread(List<point> points)    {
@@ -247,6 +252,8 @@ namespace Bewegungserkennung
             //Thread.Sleep(2000);
 
             Console.ReadLine();
+
+            mainWindow.Close();
         }
     }
 }

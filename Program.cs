@@ -7,7 +7,7 @@ namespace Bewegungserkennung
 {
     class Program
     {
-        private static int shapeNumber = 2; //max 22
+        private static int shapeNumber = 4; //max 22
 
         static void Main(string[] args)
         {
@@ -17,7 +17,6 @@ namespace Bewegungserkennung
             //SWPvisualization.visualizeShape(shapess[shapeNumber], new List<Cluster>());
             List<Shape> shapes = d.scaleShapes(shapess);
 
-            //SWPvisualization.visualizeShape(shapes[shapeNumber], new List<Cluster>());
 
 
             //int shapeNumber = 4;
@@ -28,9 +27,7 @@ namespace Bewegungserkennung
             //km.CLlist.Add(new Cluster(new point(3, 3), new point(15, 15)));       //for testing
 
             //Visualisierung
-            //new List<Cluster>();
             SWPvisualization.visualizeShape2(shapes[shapeNumber], km.CLlist);
-            Console.WriteLine(km.CLlist.Count);
 
             int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(10)));
             FSM machine = new FSM(km, shapes[shapeNumber], k);
