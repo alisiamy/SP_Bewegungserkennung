@@ -3,29 +3,41 @@ using System.Linq;
 using System.Collections.Generic;
 
 
-namespace Bewegungserkennung
+namespace SP_Bewegungserkennung
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            dataReader d = new dataReader("KinectDaten_Pascal.csv");
-            List<Shape> shapes = d.scaleShapes(d.readData());
+            int shapeNumber = 2; //max 22
+            dataReader d = new dataReader("C:/Users/Daria/source/repos/SP_Bewegungserkennung/SP_Bewegungserkennung/KinectDaten_Pascal.csv");
+            List<Shape> shapes = d.readData();
 
-            KMclustering km = new KMclustering(shapes[1], new point(1000,1000),2,0.001);            
+            d.scaleShapes(shapes);
+
+
+            KMclustering km = new KMclustering(shapes[shapeNumber], new point(50, 50), 2, Double.Epsilon);
             km.clustering();
 
-            int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(10)));
-            FSM machine = new FSM(km, shapes[1], k);
+
+            //Visualisierung
+           //visualisation.visualizeShape2(shapes[shapeNumber], km.CLlist);
+
+            //int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(10)));
+            FSM machine = new FSM(km, shapes[shapeNumber], 2);
 
             //FSM.serialize(machine, "testMachine.xml");
             //FSM f2 = FSM.deserialize("testMachine.xml");
 
-            foreach(Gesture g in shapes[1].getGestures()){
-            machine.recognize(g);
-            Console.WriteLine("done");
+
+            foreach (Gesture g in shapes[shapeNumber].getGestures())
+            {
+               machine.recognize(g);
+               Console.WriteLine("done");
             }
 
+            Console.ReadLine();
             return;
         }
     }

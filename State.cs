@@ -1,51 +1,79 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 
-namespace Bewegungserkennung {
+namespace SP_Bewegungserkennung
+{
 
     [DataContract]
-    class State {
+    class State
+    {
         [DataMember]
         private point center;
         [DataMember]
-        private point treshold; 
+        private point treshold;
         [DataMember]
-        public int tMin{get; private set;}
+        public int tMin { get; private set; }
         [DataMember]
-        public int tMax{get; private set;}
-        public State(Cluster c, int k, Shape s) {
+        public int tMax { get; private set; }
+        public State(Cluster c, int k , Shape s)
+        {
             center = c.mean;
             treshold = c.variance.sqroot().mult(k);
-            calculateTMinMax(c,s);
         }
 
-        public bool pointInState(point p){
-            return point.abs(point.substract(center,p)).CompareTo(treshold) <= 0;
+        public State(Cluster c, int k, Shape s, int tmi, int tma) {
+            center = c.mean;
+            treshold = c.variance.sqroot().mult(k);
+            tMin = tmi;
+            tMax = tma;
         }
-        private void calculateTMinMax(Cluster c, Shape s){
-            tMin = Int32.MaxValue;
-            tMax = 0;
-            foreach(Gesture g in s.getGestures()){
-                int counter = 0;
-                foreach(point p in g.Points){
-                    if(pointInState(p)){
-                        ++counter;  //cpu-zyklus gerettet!
+
+        public bool pointInState(point p)
+        {
+            return point.abs(point.substract(center, p)).CompareTo(treshold) <= 0;
+        }
+        public static void calculateTMinMax(Shape s, List<State> SL)
+        {
+
+            foreach (State st in SL) {
+                st.tMin = Int32.MaxValue;
+                st.tMax = 0;
+            } 
+
+            HashSet<point> [] tmpSet = new HashSet<point> [SL.Count];
+
+            for (int h = 0; h < tmpSet.Length; ++h) {
+                tmpSet[h] = new HashSet<point>();
+            }
+
+            foreach (Gesture g in s.getGestures())
+            {
+                foreach (point p in g.Points)
+                {
+                    for(int i = 0; i < SL.Count; ++i) {
+                        if (SL[i].pointInState(p))
+                        {
+                            tmpSet[i].Add(p);
+                        }
                     }
                 }
-                if(counter < tMin){
-                    tMin = counter;
-                    continue;
-                }
-                if(counter> tMax){
-                    tMax = counter;
+                for(int j = 0; j < SL.Count; ++j) {
+                    HashSet<point> hstmp = new HashSet<point>(tmpSet[j]);
+                    SL[j].tMax = SL[j].tMax > hstmp.Count ? SL[j].tMax : hstmp.Count;
+                    for (int k = 0; k < SL.Count; ++k)
+                    {
+                        if(k!=j)
+                            hstmp.ExceptWith(tmpSet[k]);
+                    }   
+
+                    SL[j].tMin = SL[j].tMin< hstmp.Count ? SL[j].tMin:hstmp.Count;
                 }
             }
-            if (tMin == 0)
-                ++tMin;
         }
-        public double distance(point p){
+        public double distance(point p)
+        {
             return center.distance(p);
         }
 

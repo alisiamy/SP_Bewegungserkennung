@@ -1,25 +1,25 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
 
-namespace Bewegungserkennung 
+namespace SP_Bewegungserkennung
 {
 
-    public class Shape 
+    public class Shape
     {
-        private Dictionary<int,Gesture> gestures;
-        public int shapeID {get; private set; }
+        private Dictionary<int, Gesture> gestures;
+        public int shapeID { get; private set; }
 
-        public Shape(int shapeID, Gesture g) 
+        public Shape(int shapeID, Gesture g)
         {
             this.shapeID = shapeID;
-            this.gestures = new Dictionary<int,Gesture>();
-            this.gestures.Add(g.gestureID,g);
+            this.gestures = new Dictionary<int, Gesture>();
+            this.gestures.Add(g.gestureID, g);
         }
 
-        public void Add(int gestureID, Gesture newGesture) 
+        public void Add(int gestureID, Gesture newGesture)
         {
             gestures.Add(gestureID, newGesture);
         }
@@ -31,12 +31,13 @@ namespace Bewegungserkennung
             return g;
         }
 
-        public List<int> getIDList(){
+        public List<int> getIDList()
+        {
 
             return gestures.Keys.ToList();
         }
 
-        public List<Gesture> getGestures() 
+        public List<Gesture> getGestures()
         {
             return gestures.Values.ToList();
         }
