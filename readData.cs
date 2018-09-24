@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Collections;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 
 
-namespace Bewegungserkennung 
+namespace SP_Bewegungserkennung
 {
 
     /*
@@ -15,20 +15,19 @@ namespace Bewegungserkennung
         FrameID;X;Y;Z;GestureID;SqlTime;Alpha;Beta;Velocity;ShapeId;UID
     */
 
-   enum LineFormat {FrameID,Y,X,Z,GestureID,SqlTime,Alpha,Beta,Velocity,ShapeID,UID};
+    enum LineFormat { FrameID, Y, X, Z, GestureID, SqlTime, Alpha, Beta, Velocity, ShapeID, UID };
 
     //TODO: file validity checking and exception handling
-    public class dataReader 
+    public class dataReader
     {
         string file;
-        private Dictionary<int,Shape> shapes;
-        private Dictionary<int,Shape> scaleDic;
-        const long FRAME = 30; 
+        private Dictionary<int, Shape> shapes;
+        const long FRAME = 30;
 
         public dataReader(string file)
         {
             this.file = file;
-            this.shapes = new Dictionary<int,Shape>();
+            this.shapes = new Dictionary<int, Shape>();
         }
 
         public List<Shape> readData()
@@ -41,19 +40,19 @@ namespace Bewegungserkennung
                 if (shapes.ContainsKey(shapeID))
                 {
                     Shape s;
-                    shapes.TryGetValue(shapeID,out s);
-                    
+                    shapes.TryGetValue(shapeID, out s);
+
                     int gestureID = Int32.Parse(properties[(int)LineFormat.GestureID]);
                     if (s.ContainsGesture(gestureID))
                     {
                         Gesture g = s.getGesture(gestureID);
                         g.Add(new point(Double.Parse(properties[(int)LineFormat.X], CultureInfo.GetCultureInfo("de-DE")),
                                         Double.Parse(properties[(int)LineFormat.Y], CultureInfo.GetCultureInfo("de-DE")),
-                                         Int64.Parse(properties[(int)LineFormat.FrameID])*FRAME));
+                                         Int64.Parse(properties[(int)LineFormat.FrameID]) * FRAME));
                     }
                     else
                     {
-                        s.Add(gestureID,new Gesture(gestureID,
+                        s.Add(gestureID, new Gesture(gestureID,
                                     new List<point>(){new point(Double.Parse(properties[(int)LineFormat.X],
                                                                     CultureInfo.GetCultureInfo("de-DE")),
                                                                 Double.Parse(properties[(int)LineFormat.Y],
@@ -63,7 +62,7 @@ namespace Bewegungserkennung
                 }
                 else
                 {
-                    shapes.Add(shapeID,new Shape(shapeID,new Gesture(Int32.Parse(properties[(int)LineFormat.GestureID]),
+                    shapes.Add(shapeID, new Shape(shapeID, new Gesture(Int32.Parse(properties[(int)LineFormat.GestureID]),
                                     new List<point>(){new point(Double.Parse(properties[(int)LineFormat.X],
                                                                     CultureInfo.GetCultureInfo("de-DE")),
                                                                 Double.Parse(properties[(int)LineFormat.Y],
@@ -74,7 +73,7 @@ namespace Bewegungserkennung
             return shapes.Values.ToList();
         }
 
-        public Shape getShape(int num) 
+        public Shape getShape(int num)
         {
             Shape ret = null;
             shapes.TryGetValue(num, out ret);
@@ -87,72 +86,38 @@ namespace Bewegungserkennung
         }
 
         //Scales all Gestures of one shape to fit in the range 1 to 100
-        public List<Shape> scaleShapes(List<Shape> shapeList) {
-            scaleDic = new Dictionary<int, Shape>();
+        public void scaleShapes(List<Shape> shapeList)
+        {
 
-            foreach (Shape shape in shapeList) {
-                foreach (Gesture g in shape.getGestures()) {
-                    List<point> points = g.Points;
-                    List<point> temp = new List<point>();
+            foreach (Shape shape in shapeList)
+            {
+                foreach (Gesture g in shape.getGestures())
+                {
 
-                    double minX = int.MaxValue;
-                    double maxX = int.MinValue;
-                    double minY = int.MaxValue;
-                    double maxY = int.MinValue;
+                    double minX = double.MaxValue;
+                    double maxX = double.MinValue;
+                    double minY = double.MaxValue;
+                    double maxY = double.MinValue;
 
-                    foreach (point p in points) {
+                    foreach (point p in g.Points)
+                    {
                         if (p.x > maxX) maxX = p.x;
                         if (p.x < minX) minX = p.x;
                         if (p.y > maxY) maxY = p.y;
                         if (p.y < minY) minY = p.y;
                     }
 
-                    double moveX = 0 - minX;
-                    double moveY = 0 - minY;
-                    double scaleX = 100 / (maxX + moveX);
-                    double scaleY = 100 / (maxY + moveY);
+                    point move = new point (0 - minX, 0 - minY);
+                    point scale = new point(100 / (maxX + move.x), 100 / (maxY + move.y));
 
-                    foreach (point p in points) {
-                        double x = (p.x + moveX) * scaleX;
-                        double y = (p.y + moveY) * scaleY;
+                    for (int i = 0; i < g.Points.Count; ++i)
+                    {
+                        g.Points[i].addition(move);
+                        g.Points[i].multiply(scale);
 
-                        if (x < 0 || y < 0) Console.WriteLine("X:" + x + " ,Y:" + y);
-
-                        temp.Add(new point(x, y));
                     }
-
-                    Gesture tempGesture = new Gesture(g.gestureID, temp);
-
-
-                    //neues Liste erstellt, da der set-accessor der point Klasse private ist 
-                    //-> Punkte k�nnen nicht manipuliert werden
-
-                    
-                    if (scaleDic.ContainsKey(shape.shapeID)) {
-                        Shape s;
-                        scaleDic.TryGetValue(shape.shapeID, out s);
-
-                        if(s.ContainsGesture(g.gestureID)) {
-                            Console.WriteLine("sollte nicht passieren");
-                        } else {
-                            s.Add(g.gestureID, tempGesture);
-                        }
-
-                        
-
-                    } else { // neues shape erstellen -> neue geste einf�gen
-                        scaleDic.Add(shape.shapeID, new Shape(shape.shapeID, tempGesture));
-                    }
-
                 }
             }
-
-            return scaleDic.Values.ToList();
         }
-
-        public List<Shape> scaleGesture(List<Shape> shapeList) {
-
-        }
-
     }
 }

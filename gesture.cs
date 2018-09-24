@@ -1,14 +1,14 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Bewegungserkennung 
+namespace SP_Bewegungserkennung
 {
 
-    public class Gesture 
+    public class Gesture
     {
-        public List<point> Points {get; set; }
-        public int gestureID {get; private set; }
+        public List<point> Points { get; set; }
+        public int gestureID { get; private set; }
 
         public Gesture(int gestureID, List<point> p)
         {
@@ -17,12 +17,12 @@ namespace Bewegungserkennung
             Points.Sort(new pointComparer());
         }
 
-        public void Add(point p) 
+        public void Add(point p)
         {
             int idx = Points.BinarySearch(p, new pointComparer());
-            if(idx<0)
+            if (idx < 0)
                 idx = ~idx;
-            Points.Insert(idx,p);
+            Points.Insert(idx, p);
         }
     }
 }

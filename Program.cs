@@ -1,51 +1,51 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Windows.Forms;
+using System.Drawing;
 
 
-namespace Bewegungserkennung
+namespace SP_Bewegungserkennung
 {
     class Program
     {
-        private static int shapeNumber = 4; //max 22
 
         static void Main(string[] args)
         {
+
+            int shapeNumber = 2; //max 22
             dataReader d = new dataReader("KinectDaten_Pascal.csv");
-            List<Shape> shapess= d.readData();
+            List<Shape> shapes = d.readData();
 
-            //SWPvisualization.visualizeShape(shapess[shapeNumber], new List<Cluster>());
-            List<Shape> shapes = d.scaleShapes(shapess);
-
+            d.scaleShapes(shapes);
 
 
-            //int shapeNumber = 4;
-            double variance = 50;
-            KMclustering km = new KMclustering(shapes[shapeNumber], new point(variance,variance),2,0.001);            
+            KMclustering km = new KMclustering(shapes[shapeNumber], new point(50, 50), 2, Double.Epsilon);
             km.clustering();
 
-            //km.CLlist.Add(new Cluster(new point(3, 3), new point(15, 15)));       //for testing
+            //variable to determine the size of the clusters
+            int k = 3; 
 
             //Visualisierung
-            SWPvisualization.visualizeShape2(shapes[shapeNumber], km.CLlist);
+            visualisation.visualizeShape2(shapes[shapeNumber], km.CLlist, k);
 
-            int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(10)));
+            //int k = Convert.ToInt32(Math.Ceiling(Math.Sqrt(10)));
             FSM machine = new FSM(km, shapes[shapeNumber], k);
 
             //FSM.serialize(machine, "testMachine.xml");
             //FSM f2 = FSM.deserialize("testMachine.xml");
 
-            
-            foreach(Gesture g in shapes[shapeNumber].getGestures()) {
-                if(machine.recognize(g)) {
-                    Console.WriteLine("Maschine erkannt");
-                    break;
-                }
-                //Console.WriteLine("done");
+
+            foreach (Gesture g in shapes[shapeNumber].getGestures())
+            {
+               machine.recognize(g);
+               Console.WriteLine("done");
             }
 
-            Console.WriteLine("Alles durchgelaufen");
             Console.ReadLine();
+
+            visualisation.closeVisualisation();
+
             return;
         }
     }
