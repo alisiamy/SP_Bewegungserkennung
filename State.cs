@@ -10,9 +10,9 @@ namespace SP_Bewegungserkennung
     class State
     {
         [DataMember]
-        private point center;
+        public point center { get; private set; }
         [DataMember]
-        private point treshold;
+        public point treshold { get; private set; }
         [DataMember]
         public int tMin { get; private set; }
         [DataMember]
@@ -32,7 +32,7 @@ namespace SP_Bewegungserkennung
 
         public bool pointInState(point p)
         {
-            return point.abs(point.substract(center, p)).CompareTo(treshold) <= 0;
+            return point.abs(point.substract(p, center)).compareXY(treshold);
         }
         public static void calculateTMinMax(Shape s, List<State> SL)
         {
@@ -68,7 +68,7 @@ namespace SP_Bewegungserkennung
                             hstmp.ExceptWith(tmpSet[k]);
                     }   
 
-                    SL[j].tMin = SL[j].tMin< hstmp.Count ? SL[j].tMin:hstmp.Count;
+                    SL[j].tMin = SL[j].tMin< hstmp.Count ? SL[j].tMin:hstmp.Count; //tmin darf nicht null sein
                 }
             }
         }

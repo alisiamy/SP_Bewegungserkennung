@@ -14,20 +14,21 @@ namespace SP_Bewegungserkennung
         [DataMember]
         public long time { get; private set; }
 
+        // Main constructor
         public point(double px, double py)
         {
             x = px;
             y = py;
             time = 0;
         }
-
+        // --
         public point(point p)
         {
             x = p.x;
             y = p.y;
             time = p.time;
         }
-
+        // ---
         public point(double px, double py, long t)
         {
             x = px;
@@ -35,24 +36,25 @@ namespace SP_Bewegungserkennung
             time = t;
 
         }
-
+        // Add a point on to existing one
         public void addition(point ipt)
         {
             this.x += ipt.x;
             this.y += ipt.y;
         }
-
+        //Substract a point from an extisting one 
         public void subtraction(point ipt)
         {
             this.x -= ipt.x;
             this.y -= ipt.y;
         }
-
+        //Subsract one point from another
         public static point substract(point p1, point p2)
         {
             return new point(p1.x - p2.x, p1.y - p2.y);
         }
 
+        // Divide a point with a 
         public void divide(int c)
         {
             this.x /= c;
@@ -103,6 +105,12 @@ namespace SP_Bewegungserkennung
         public static point abs(point p)
         {
             return new point(Math.Abs(p.x), Math.Abs(p.y));
+        }
+
+        public bool compareXY(point p)
+        {
+            return this.x <= p.x && this.y <= p.y;
+
         }
 
 

@@ -12,7 +12,7 @@ namespace SP_Bewegungserkennung
     class FSM
     {
         [DataMember]
-        private List<State> stateList;
+        public List<State> stateList { get; private set; }
         private int currentState = 0;
         private int time = 0;
 
