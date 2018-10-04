@@ -19,6 +19,15 @@ namespace SP_Bewegungserkennung
             this.gestures.Add(g.gestureID, g);
         }
 
+        public Shape(int shapeID, List<Gesture> lg) {
+            this.shapeID = shapeID;
+            this.gestures = new Dictionary<int, Gesture>();
+
+            for (int i = 0; i < lg.Count; ++i) {
+                this.gestures.Add(lg[i].gestureID, lg[i]);
+            }
+        }
+
         public void Add(int gestureID, Gesture newGesture)
         {
             gestures.Add(gestureID, newGesture);

@@ -10,7 +10,7 @@ namespace SP_Bewegungserkennung
 
         static void Main(string[] args)
         {
-            int shapeNumber = 4;  // shape to work with
+            int shapeNumber = 5;  // shape to work with
 
             //** Data for Clustering,FSM and Rcognition**
 
@@ -20,6 +20,11 @@ namespace SP_Bewegungserkennung
             d.scaleShapes(shapes);
 
 
+            evaluation ev = new evaluation(shapes);
+
+            ev.evaluate(3, new point(50,50));
+
+            /*
             //**Run Clustering**
 
             KMclustering km = new KMclustering(shapes[shapeNumber], new point(50, 50), 2, Double.Epsilon);
@@ -27,8 +32,8 @@ namespace SP_Bewegungserkennung
 
             // **Visualize Clusters**
 
-            //visualiser vsl = new visualiser(km.CLlist);
-            //vsl.runVisualiser();
+            visualiser vsl = new visualiser(km.CLlist);
+            vsl.runVisualiser();
 
 
             // **Create FSM**
@@ -64,7 +69,7 @@ namespace SP_Bewegungserkennung
        
        
             Console.ReadLine();
-            return;
+            return;*/
         }
     }
 }
