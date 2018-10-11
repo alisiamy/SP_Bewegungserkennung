@@ -10,7 +10,7 @@ namespace SP_Bewegungserkennung
 
         static void Main(string[] args)
         {
-            int shapeNumber = 5;  // shape to work with
+            int shapeNumber = 4;  // shape to work with
 
             //** Data for Clustering,FSM and Rcognition**
 
@@ -22,54 +22,60 @@ namespace SP_Bewegungserkennung
 
             evaluation ev = new evaluation(shapes);
 
-            ev.evaluate(3, new point(50,50));
+            ev.evaluate(5, new point(20,20));
+
+            ev.saveEvaluation("C:/Users/Daria/Desktop/evRES.csv");
+
 
             /*
-            //**Run Clustering**
 
-            KMclustering km = new KMclustering(shapes[shapeNumber], new point(50, 50), 2, Double.Epsilon);
-            km.clustering();
+           //**Run Clustering**
 
-            // **Visualize Clusters**
+           KMclustering km = new KMclustering(shapes[shapeNumber], new point(50, 50), 2, Double.Epsilon);
+           km.clustering();
 
-            visualiser vsl = new visualiser(km.CLlist);
-            vsl.runVisualiser();
+           // **Visualize Clusters**
+           // visualisation.visualizeShape2(shapes[shapeNumber], km.CLlist, 3);
 
-
-            // **Create FSM**
-
-            FSM machine = new FSM(km, shapes[shapeNumber], 3);
-
-            // **Serialise FSM**
-
-            //FSM.serialize(machine, "testMachine.xml");
-            //FSM f2 = FSM.deserialize("testMachine.xml");
+           visualiser vsl = new visualiser(km.CLlist);
+           vsl.runVisualiser();
 
 
-            // **Visualize States**
+           // **Create FSM**
 
-            List<point> pvis = new List<point>();
+           FSM machine = new FSM(km, shapes[shapeNumber], 3);
 
-            foreach (Gesture g in shapes[shapeNumber].getGestures()) {
-                foreach (point p in g.Points) {
-                    pvis.Add(p);
-                }
-            }
+           // **Serialise FSM**
 
-            visualiser vsl2 = new visualiser(machine.stateList,pvis);
-            vsl2.runVisualiser();
+           //FSM.serialize(machine, "testMachine.xml");
+           //FSM f2 = FSM.deserialize("testMachine.xml");
 
-            // **Recognition**
 
-            foreach (Gesture g in shapes[shapeNumber].getGestures())
-            {
-               machine.recognize(g);
-               Console.WriteLine("not recognized");
-            }
-       
-       
-            Console.ReadLine();
-            return;*/
+           // **Visualize States**
+
+           List<point> pvis = new List<point>();
+
+           foreach (Gesture g in shapes[shapeNumber].getGestures()) {
+               foreach (point p in g.Points) {
+                   pvis.Add(p);
+               }
+           }
+
+           visualiser vsl2 = new visualiser(machine.stateList,pvis);
+           vsl2.runVisualiser();
+
+           // **Recognition**
+
+           foreach (Gesture g in shapes[shapeNumber].getGestures())
+           {
+                machine.recognize(g);
+                            
+           }
+
+
+           Console.ReadLine();
+           return;//*/
+
         }
     }
 }

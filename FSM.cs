@@ -135,6 +135,7 @@ namespace SP_Bewegungserkennung
         {
             if (currentState == stateList.Count - 1)
             {
+
                 return Status.RECOGNIZED;
             }
             if (!stateList[currentState].pointInState(livePoint) && currentState == 0 && time == 0)

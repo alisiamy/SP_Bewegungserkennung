@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+
 
 namespace SP_Bewegungserkennung
 {
     class evaluation
     {
-        readonly float[] percentage = {0.25f, 0.5f, 0.75f, 1};
+        readonly float[] percentage = { 0.25f, 0.5f, 0.75f, 1 };
         readonly string format = "percentage;shapeID;recognitionRate;FalsePositiveRates";
-        public string result { get; private set;}
+        public string result { get; private set; }
         List<Shape> shapeList;
-               
+
 
         public evaluation(List<Shape> sl)
         {
@@ -20,21 +20,27 @@ namespace SP_Bewegungserkennung
             result = "";
         }
 
-        private double evaluateRecognitionRate(FSM machine, List<Gesture> gesturelist) {
+        private double evaluateRecognitionRate(FSM machine, List<Gesture> gesturelist)
+        {
 
             int counter = 0;
-            foreach (Gesture g in gesturelist) {
-                if (machine.recognize(g)) {
+            foreach (Gesture g in gesturelist)
+            {
+                if (machine.recognize(g))
+                {
                     ++counter;
                 }
             }
-            return counter/(double)gesturelist.Count;
+            return counter / (double)gesturelist.Count;
         }
-        private List<double> evaluateFalsePositives(FSM machine, int currentShape) {
+        private List<double> evaluateFalsePositives(FSM machine, int currentShape)
+        {
             List<double> resList = new List<double>();
 
-            for (int i = 0; i < shapeList.Count; ++i) {
-                if (i == currentShape) {
+            for (int i = 0; i < shapeList.Count; ++i)
+            {
+                if (i == currentShape)
+                {
                     continue;
                 }
                 resList.Add(evaluateRecognitionRate(machine, shapeList[i].getGestures()));
@@ -42,18 +48,34 @@ namespace SP_Bewegungserkennung
             return resList;
         }
 
-        public void evaluate(int tresholdMultiplier, point variance) {
+        public string evaluate(int tresholdMultiplier, point variance)
+        {
 
-            foreach (float percent in percentage) {
-                for (int i = 1; i < shapeList.Count; ++i) {
+            StringBuilder sb = new StringBuilder(format);
+            sb.Append('\n');
 
-                    List<Gesture> traininggestures = shapeList[i].getGestures();
-                    List<Gesture> testinggestures = shapeList[i].getGestures();
+            foreach (float percent in percentage)
+            {
+                for (int i = 1; i < shapeList.Count; ++i)
+                {
+
+                    List<Gesture> traininggestures = shapeList[i].getGestures(); // data for FSM
+                    List<Gesture> testinggestures = new List<Gesture>();
                     if (percent < 1)
                     {
                         int num_elems = (int)Math.Ceiling(traininggestures.Count * percent);
-                        traininggestures.RemoveRange(0,num_elems);
-                        testinggestures.RemoveRange(num_elems, testinggestures.Count - num_elems);
+
+                        Random r = new Random(0);
+                        for (int j = 0; j < num_elems; ++j)
+                        {
+                            int index = r.Next(0, traininggestures.Count);
+                            testinggestures.Add(traininggestures[index]);
+                            traininggestures.RemoveAt(index);
+                        }
+
+                    }
+                    if (percent == 1) {
+                        testinggestures = traininggestures;
                     }
                     Shape tmpShape = new Shape(shapeList[i].shapeID, traininggestures);
                     KMclustering km = new KMclustering(shapeList[i], variance);
@@ -64,11 +86,26 @@ namespace SP_Bewegungserkennung
 
                     double rate = evaluateRecognitionRate(machine, testinggestures);
                     List<double> falsepositive = evaluateFalsePositives(machine, i);
-                    
+
+                    sb.Append(percent * 100).Append(";").Append(shapeList[i].shapeID).Append(";").Append(rate).Append(";").Append(string.Join(",",falsepositive.ToArray())).Append('\n');
                 }
             }
+            result = sb.ToString();
+            return result;
         }
 
+        public void saveEvaluation(string path)
+        {
 
+            FileInfo fileInfo = new FileInfo(path);
+
+            using (FileStream fs = fileInfo.OpenWrite())
+            {
+                byte[] res = Encoding.ASCII.GetBytes(result);
+                fs.Write(res, 0, res.Length);
+            }
+
+
+        }
     }
 }
