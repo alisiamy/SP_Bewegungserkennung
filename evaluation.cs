@@ -97,11 +97,13 @@ namespace SP_Bewegungserkennung {
 
             StringBuilder sb = new StringBuilder();
             //format
-            for (int q = 1; q <= 23; q++) {
+            for (int q = 1; q < 23; q++) {
                 sb.Append(q).Append(";");
             }
             sb.Append("totalRecognised").Append(";").Append("totalTested").Append(";");
             sb.Append("\n");
+
+            List<FSM> machineList = new List<FSM>();
 
             //percent = 100
             for (int i = 1; i < shapeList.Count; ++i) {
@@ -117,33 +119,73 @@ namespace SP_Bewegungserkennung {
                 km.clustering();
 
                 FSM machine = new FSM(km, shapeList[i], tresholdMultiplier);
+                machineList.Add(machine);
+            }
 
-
-
-                int totalRecognised = 0;
-                int totalTested = 0;
-                for (int c = 0; c < 23; c++) { //for each row
-                    int rec = evaluateMachine(machine, shapeList[c].getGestures());
-                    sb.Append(rec).Append(";");
-
-                    totalRecognised += rec;
-                    totalTested += shapeList[c].getGestures().Count;
-                }
-                sb.Append(totalRecognised).Append(";").Append(totalTested).Append(";").Append('\n');
+            for (int i = 0; i < shapeList.Count; i++) {
+                //Console.WriteLine("Teste Shape " + i + "  mit " + shapeList[i].getGestures().Count + " Gesten, " + machineList.Count + " Maschinen");
+                evaluateShape(shapeList[i], machineList, sb);
             }
 
             result = sb.ToString();
             return result;
         }
 
-        private int evaluateMachine(FSM machine, List<Gesture> gestureList) {
-            int counter = 0;
-            foreach (Gesture g in gestureList) {
-                if (machine.recognize(g)) {
-                    ++counter;
+        private void evaluateShape(Shape shape, List<FSM> machineList, StringBuilder sb) {
+            int[] totalRecognised = new int[machineList.Count];
+            int totalGesturesTested = 0;
+            int totalGesturesRecognised = 0;
+
+            foreach (Gesture g in shape.getGestures()) {
+                int recognisedMachine = -1;
+                int[] recognizedMachinesInGesture = new int[machineList.Count]; //for late, to see wich machines are in conflict
+                bool recogInThisIteration = false;
+                totalGesturesTested++;
+
+                for (int m = 0; m < machineList.Count; m++) {
+                    if (machineList[m].recognize(g)) {
+                        if (recogInThisIteration) {
+                            //Console.WriteLine("Problem: multiple machines recognised same gesture at the same time");
+                            recognisedMachine = -1;
+
+                        } else {
+                            recognisedMachine = m;
+                            totalGesturesRecognised++;
+                        }
+
+                        recognizedMachinesInGesture[m]++;
+                        recogInThisIteration = true;
+                    }
                 }
+
+                //Handle machines that recognize Gesture at the same time:
+                //look for machine with shortest summed up distance between all clusters
+                if (recogInThisIteration) {
+                    //interim solution: take the first one
+                    for (int i = 0; i < recognizedMachinesInGesture.Length; i++) {
+                        if (recognizedMachinesInGesture[i] != 0) {
+                            recognisedMachine = i;
+                            break;
+                        }
+                    }
+
+                }
+
+                //no machine recognized
+                if (recognisedMachine < 0) {
+                    continue;
+                }
+
+
+                totalRecognised[recognisedMachine]++;
+            } //end of foreach(Gesture) loop
+
+            //build string for each shape
+            Console.WriteLine(machineList.Count + "machines");
+            for (int i = 0; i < totalRecognised.Length; i++) {
+                sb.Append(totalRecognised[i]).Append(";");
             }
-            return counter;
+            sb.Append(totalGesturesRecognised).Append(";").Append(totalGesturesTested).Append(";").Append("\n");
         }
     }
 }
