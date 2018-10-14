@@ -8,7 +8,7 @@ namespace SP_Bewegungserkennung
 
     class Cluster
     {
-        private List<point> CL;
+        public List<point> points { get; private set; }
         public point variance { get; private set; }
         public point mean { get; private set; }
         private double covariance;
@@ -23,53 +23,48 @@ namespace SP_Bewegungserkennung
         public Cluster(point ipt)
         {
             mean = ipt;
-            CL = new List<point>();
+            points = new List<point>();
             addToCluster(ipt);
         }
 
         public Cluster(List<point> points)
         {
-            CL = points;
+            this.points = points;
             updateCluster();
-        }
-
-        public List<point> getPoints()
-        {
-            return CL;
         }
 
         public void clearCluster()
         {
-            CL = new List<point>();
+            points = new List<point>();
         }
 
         private void calculateEV()
         {
             mean = new point(0, 0); // TODO: moegliche Optimierung
-            foreach (point p in CL)
+            foreach (point p in points)
                 mean.addition(p);
 
-            mean.divide(CL.Count);
+            mean.divide(points.Count);
         }
 
         private void calculateVariance()
         {
             variance = new point(0, 0);
-            foreach (point p in CL)
+            foreach (point p in points)
                 variance.addition(point.substract(p, mean).power(2));
             Debug.Assert(!Double.IsInfinity(variance.x) && !Double.IsInfinity(variance.y) && !Double.IsNaN(variance.x) && !Double.IsNaN(variance.y));
-            variance.divide(CL.Count);
+            variance.divide(points.Count);
         }
 
         private void calculateCV()
         {
             covariance = 0;
 
-            Debug.Assert(CL.Count != 0);
-            foreach (point p in CL)
+            Debug.Assert(points.Count != 0);
+            foreach (point p in points)
             {
                 point tmp = point.substract(p, mean);
-                covariance += tmp.x * tmp.y / CL.Count;
+                covariance += tmp.x * tmp.y / points.Count;
             }
         }
 
@@ -103,13 +98,13 @@ namespace SP_Bewegungserkennung
 
         public void addToCluster(point ipt)
         {
-            CL.Add(ipt);
+            points.Add(ipt);
         }
 
         public Cluster split()
         {
-            Cluster other = new Cluster(CL.GetRange(0, CL.Count / 2));
-            CL.RemoveRange(0, CL.Count / 2);
+            Cluster other = new Cluster(points.GetRange(0, points.Count / 2));
+            points.RemoveRange(0, points.Count / 2);
             updateCluster();
             return other;
         }

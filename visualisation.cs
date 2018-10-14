@@ -36,6 +36,13 @@ namespace SP_Bewegungserkennung
             visThread.Start();
         }
 
+        public static void visualizeGesture(List<point> points) {
+            visThread = new Thread(new ThreadStart(() => visualisationThreads.visualizeGestureThread(points))); //lambda expression to start thread with parameter
+            visThread.SetApartmentState(ApartmentState.STA);
+            stopEvent.Reset();
+            visThread.Start();
+        }
+
         public static void closeVisualisation() {
             visualisationThreads.closeWindow();
             visThread.Abort();
@@ -54,10 +61,11 @@ namespace SP_Bewegungserkennung
                 Console.WriteLine("starte VIS");
 
                 // Create the application's main window
-                //var mainWindow = new Window();
+
                 mainWindow.Height = windowSize + 100;
                 mainWindow.Width = windowSize + 100;
                 mainWindow.DragMove();
+
                 // Create a canvas sized to fill the window
                 Canvas myCanvas = new Canvas();
 
@@ -94,7 +102,7 @@ namespace SP_Bewegungserkennung
                 foreach (Gesture g in s.getGestures()) {
                     List<point> points = g.Points;
                     foreach (point p in points) {
-                        if (pointInCluster2(p, clus.mean, clus.variance.sqroot().mult(k))) {
+                        if (pointInCluster(p, clus.mean, clus.variance.sqroot().mult(k))) {
                             Rectangle myRect = new Rectangle();
                             myRect.Stroke = Brushes.Black;
                             myRect.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;

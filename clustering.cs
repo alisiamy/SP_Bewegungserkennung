@@ -14,7 +14,7 @@ namespace SP_Bewegungserkennung
         private point sigmaNull;
         private double epsilon;
 
-        public KMclustering(Shape s, point sNull, int k = 2, double epsilon = 0.5)
+        public KMclustering(Shape s, point sNull, int k = 2, double epsilon = Double.Epsilon)
         {
             this.k = k;
             this.sigmaNull = sNull;

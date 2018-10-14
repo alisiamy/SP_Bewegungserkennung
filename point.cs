@@ -14,20 +14,21 @@ namespace SP_Bewegungserkennung
         [DataMember]
         public long time { get; private set; }
 
+        // Main constructor
         public point(double px, double py)
         {
             x = px;
             y = py;
             time = 0;
         }
-
+        // --
         public point(point p)
         {
             x = p.x;
             y = p.y;
             time = p.time;
         }
-
+        // ---
         public point(double px, double py, long t)
         {
             x = px;
@@ -35,78 +36,61 @@ namespace SP_Bewegungserkennung
             time = t;
 
         }
-
+        // Add a point on to existing one
         public void addition(point ipt)
         {
             this.x += ipt.x;
             this.y += ipt.y;
         }
-
+        //Substract a point from an extisting one 
         public void subtraction(point ipt)
         {
             this.x -= ipt.x;
             this.y -= ipt.y;
         }
-
+        //Subsract one point from another
         public static point substract(point p1, point p2)
         {
             return new point(p1.x - p2.x, p1.y - p2.y);
         }
 
+        // Divide a point with a variable
         public void divide(int c)
         {
             this.x /= c;
             this.y /= c;
         }
-
+        // Multiply a point with a variable
         public point mult(double m)
         {
             return new point(this.x * m, this.y * m);
         }
-
+        //Multiply a point with a variable
         public void multiply(point p) {
             this.x *= p.x;
             this.y *= p.y;
         }
-
+        //Power functions with point as a base and a n as an exponent
         public point power(double n)
         {
             return new point(Math.Pow(this.x, n), Math.Pow(this.y, n));
         }
-
+        //Square root of a point
         public point sqroot()
         {
             return new point(Math.Sqrt(this.x), Math.Sqrt(this.y));
-        }
-
-        public bool pround(point old)
-        {
-            if (this.Equals(old))
-                return true;
-
-            if (Double.IsInfinity(this.x) || Double.IsNaN(old.x) || Double.IsInfinity(this.y) || Double.IsNaN(old.y))
-                return false;
-
-            if (Double.IsInfinity(old.x) || Double.IsNaN(this.x) || Double.IsInfinity(old.y) || Double.IsNaN(this.y))
-                return false;
-
-            return Math.Abs(this.x - old.x) <= 0.000000001 && Math.Abs(this.y - old.y) <= 0.000000001;
-
-        }
-
-        public void abs()
-        {
-            this.x = Math.Abs(this.x);
-            this.y = Math.Abs(this.y);
-        }
-
+        }        
+        //Modulus of a point
         public static point abs(point p)
         {
             return new point(Math.Abs(p.x), Math.Abs(p.y));
         }
+        //Comprare a point to an existing one 
+        public bool compareXY(point p)
+        {
+            return this.x <= p.x && this.y <= p.y;
 
-
-
+        }
         public int CompareTo(point comparepoint)
         {
             if (comparepoint == null)

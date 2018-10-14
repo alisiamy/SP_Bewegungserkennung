@@ -107,7 +107,7 @@ namespace SP_Bewegungserkennung
                         if (p.y < minY) minY = p.y;
                     }
 
-                    point move = new point (0 - minX, 0 - minY);
+                    point move = new point(0 - minX, 0 - minY);
                     point scale = new point(100 / (maxX + move.x), 100 / (maxY + move.y));
 
                     for (int i = 0; i < g.Points.Count; ++i)
@@ -117,6 +117,17 @@ namespace SP_Bewegungserkennung
 
                     }
                 }
+                /*foreach (Shape s in shapeList)
+                {
+                    List<Gesture> glist = s.getGestures();
+                    for (int i = 0; i < glist.Count; ++i)
+                    {
+
+                        point diff = point.substract(new point(0, 0), glist[i].Points[0]);
+                        for (int j = 0; j < glist[i].Points.Count; ++j)
+                            glist[i].Points[j].addition(diff);
+                    }
+                }*/
             }
         }
     }
