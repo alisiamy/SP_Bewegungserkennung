@@ -98,7 +98,7 @@ namespace SP_Bewegungserkennung {
             StringBuilder sb = new StringBuilder();
             //format
             for (int q = 0; q < 23; q++) {
-                sb.Append(q).Append(";");
+                sb.Append(q+1).Append(";");
             }
             sb.Append("totalRecognised").Append(";").Append("totalTested").Append(";");
             sb.Append("\n");

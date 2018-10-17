@@ -13,14 +13,23 @@ namespace SP_Bewegungserkennung {
 
             dataReader d = new dataReader("C:/Users/Mori/source/repos/ConsoleApp1/ConsoleApp1/bin/Release/KinectDaten_Pascal.csv");
             List<Shape> shapes = d.readData();
+            //int[] badShapes = { 23, 20, 16, 15, 12, 10, 2, 1};
+            int[] badShapes = { 23, 22, 21, 20, 19, 18, 17, 11, 9, 8, 7, 6, 3, 2, 1 };
+
+            for (int i = 0; i < badShapes.Length; i++) {
+                shapes.RemoveAt(badShapes[i]-1); //indizes beginnen ab 0
+            } 
+
 
             d.scaleShapes(shapes);
 
             evaluation ev = new evaluation(shapes);
 
-            ev.evaluate2(5, new point(20, 20));
+            int k = 5;
+            double variance = 30;
+            ev.evaluate2(k, new point(variance, variance));
 
-            ev.saveEvaluation("C:/Users/Mori/Desktop/evRES2.csv");
+            ev.saveEvaluation("C:/Users/Mori/Desktop/evRES_5_30_verySlim.csv");
 
             Console.WriteLine("FERTIG!");
             Console.ReadLine();
