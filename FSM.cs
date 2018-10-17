@@ -63,7 +63,7 @@ namespace SP_Bewegungserkennung
                 }
                 gestureClusterIdx.Add(idxList);  
             }
-            //list result contains the order of the cluster of the greates lenght
+            //list result contains the order of the cluster with temporal information
             List<Cluster> result = new List<Cluster>();
             for (int i = 0; i < gestureClusterIdx[0].Count; i++)
             {
@@ -79,8 +79,8 @@ namespace SP_Bewegungserkennung
                     {
                     };
                 }
-                int maxIdx = 0; //index with max lenght
-                int maxfame = voting[0]; //max lenght of cluster
+                int maxIdx = 0; 
+                int maxfame = voting[0]; 
                 for (int j = 1; j < voting.Length; ++j)
                 {
                     if (maxfame < voting[j])

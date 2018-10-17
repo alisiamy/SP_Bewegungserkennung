@@ -1,74 +1,80 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-    
-namespace Bewegungserkennung 
+
+namespace SP_Bewegungserkennung
 {
+
+    class Cluster
+    {
+        public List<point> points { get; private set; }
+        public point variance { get; private set; }
+        public point mean { get; private set; } 
         
- class Cluster
- {   
-        private List<point> CL;
-        public point variance {get; private set; }
-        public point mean {get; private set; }
-		private double covariance;
+        //for malahanobis distance
+        private double covariance;
         private double[] ikvm;
 
+        public Cluster(point var, point me)
+        {
+            variance = var;
+            mean = me;
+        }
+
+        //each cluster has points, mean, variance
         public Cluster(point ipt)
         {
             mean = ipt;
-            CL = new List<point>();
+            points = new List<point>();
             addToCluster(ipt);
         }
 
         public Cluster(List<point> points)
         {
-            CL = points;
+            this.points = points;
             updateCluster();
         }
 
-        public List<point> getPoints()
-        {
-                return CL;
-        }
-
+        //delete Cluster
         public void clearCluster()
         {
-            CL = new List<point>();
+            points = new List<point>();
         }
 
-        private void calculateEV()
+        private void calculateMean()
         {
-            mean = new point(0,0); // TODO: moegliche Optimierung
-            foreach (point p in CL)
+            mean = new point(0, 0); 
+            foreach (point p in points)
                 mean.addition(p);
 
-            mean.divide(CL.Count);
+            mean.divide(points.Count);
         }
 
         private void calculateVariance()
         {
-            variance = new point(0,0);
-            foreach (point p in CL)
-                variance.addition(point.substract(p,mean).power(2));
+            variance = new point(0, 0);
+            foreach (point p in points)
+                variance.addition(point.substract(p, mean).power(2));
             Debug.Assert(!Double.IsInfinity(variance.x) && !Double.IsInfinity(variance.y) && !Double.IsNaN(variance.x) && !Double.IsNaN(variance.y));
-            variance.divide(CL.Count);
+            variance.divide(points.Count);
         }
 
-		private void calculateCV()
+        //getting Covariance
+        private void calculateCV()
         {
             covariance = 0;
 
-            Debug.Assert(CL.Count != 0);
-            foreach (point p in CL)
+            Debug.Assert(points.Count != 0);
+            foreach (point p in points)
             {
-                point tmp = point.substract(p,mean);
-                covariance += tmp.x*tmp.y / CL.Count;
+                point tmp = point.substract(p, mean);
+                covariance += tmp.x * tmp.y / points.Count;
             }
         }
-         
-         private void KVmatrixinverse()
-         {
+
+        private void KVmatrixinverse()
+        {
             this.ikvm = new double[4];
 
             double a = variance.x;
@@ -76,47 +82,50 @@ namespace Bewegungserkennung
             double d = variance.y;
             Debug.Assert(!Double.IsNaN(a) && !Double.IsNaN(bc) && !Double.IsNaN(d));
 
-            double divider = a*d - Math.Pow(bc,2);
+            double divider = a * d - Math.Pow(bc, 2);
 
             Debug.Assert(divider != 0);
 
-            this.ikvm[0] = d/divider;
-            this.ikvm[1] = -bc/divider;  
+            this.ikvm[0] = d / divider;
+            this.ikvm[1] = -bc / divider;
             this.ikvm[2] = this.ikvm[1];
-            this.ikvm[3] = a/divider; 
-         }
+            this.ikvm[3] = a / divider;
+        }
 
         public void updateCluster()
         {
-             this.calculateEV();
-             this.calculateVariance(); 
-             this.calculateCV();
-             this.KVmatrixinverse();
-
+            this.calculateMean();
+            this.calculateVariance();
         }
 
+        //add point to cluster
         public void addToCluster(point ipt)
         {
-            CL.Add(ipt);
+            points.Add(ipt);
         }
 
+        //split cluster to get another one
         public Cluster split()
         {
-            Cluster other = new Cluster(CL.GetRange(0,CL.Count/2));
-            CL.RemoveRange(0,CL.Count/2);
+            Cluster other = new Cluster(points.GetRange(0, points.Count / 2)); //split one cluster in two
+            points.RemoveRange(0, points.Count / 2);
             updateCluster();
             return other;
+        }
+
+        public double euclideanDist(point p)
+        {
+            return mean.distance(p);
         }
 
         //Mahalanobis distance between a point and a cluster
         public double mahalanobisDist(point p)
         {
-            point tmp = point.substract(p,mean);
-            
-            point p1im = new point(tmp.x*ikvm[0]+tmp.y*ikvm[2],tmp.x*ikvm[1]+tmp.y*ikvm[3]); // transpone
-            
-            Debug.Assert(tmp.x*p1im.x+tmp.y*p1im.y >= 0);
-            return Math.Sqrt(tmp.x*p1im.x+tmp.y*p1im.y);
+            point tmp = point.substract(p, mean);
+
+            point p1im = new point(tmp.x * ikvm[0] + tmp.y * ikvm[2], tmp.x * ikvm[1] + tmp.y * ikvm[3]); // transpone
+
+            return Math.Sqrt(tmp.x * p1im.x + tmp.y * p1im.y);
         }
 
     }
