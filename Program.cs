@@ -3,67 +3,116 @@ using System.Linq;
 using System.Collections.Generic;
 
 
-namespace SP_Bewegungserkennung
-{
-    class Program
-    {
+namespace SP_Bewegungserkennung {
+    class Program {
 
-        static void Main(string[] args)
-        {
-            int shapeNumber = 2;  // shape to work with
-
-            //** Data for Clustering,FSM and Rcognition**
-
-            dataReader d = new dataReader("C:/Users/Daria/source/repos/SP_Bewegungserkennung/SP_Bewegungserkennung/KinectDaten_Pascal.csv");
-            List<Shape> shapes = d.readData();
-
-            d.scaleShapes(shapes);
+        static void Main(string[] args) {
+            //Parameters
+            point variance = new point(30, 30);
+            int tresholdMultiplier = 5;
 
 
-            //**Run Clustering**
-
-            KmeansClustering km = new KmeansClustering(shapes[shapeNumber], new point(25, 25), 2, Double.Epsilon);
-            km.clustering();
-
-            // **Visualize Clusters**
-
-            //visualiser vsl = new visualiser(km.CLlist);
-            //vsl.runVisualiser();
+            //Data for Clustering,FSM and Recognition
+            dataReader d = new dataReader("C:/Users/Mori/source/repos/ConsoleApp1/ConsoleApp1/bin/Release/KinectDaten_Pascal.csv");
+            List<Shape> shapeList = d.readData();
 
 
-            // **Create FSM**
+            //Preprocess Data
+            d.scaleShapes(shapeList);
 
-            FSM machine = new FSM(km, shapes[shapeNumber], 3);
 
-            // **Serialise FSM**
+            //Gesture to recognize
+            Gesture g = shapeList[7].getGestures()[15];     //some randome Gesture
 
+
+            //Create Finite State Machine for each Shape
+            List<KMclustering> clusterList = new List<KMclustering>();
+            List<FSM> machineList = new List<FSM>();
+            for (int i = 0; i < shapeList.Count; ++i) {
+                KMclustering km = new KMclustering(shapeList[i], variance);
+
+                km.clustering();
+
+                FSM machine = new FSM(km, shapeList[i], tresholdMultiplier);
+                machineList.Add(machine);
+            }
+
+
+            //Possibility to serialise FSM
             //FSM.serialize(machine, "testMachine.xml");
-            //FSM f2 = FSM.deserialize("testMachine.xml");
+            //FSM fsm = FSM.deserialize("testMachine.xml");
 
 
-            // **Visualize States**
+            //Possibilty to visualize a shape or a gesture
+            //int shapeToVisualize = 2;
+            //visualisation.visualizeShape(shapeList[shapeToVisualize], clusterList[shapeToVisualize].CLlist, tresholdMultiplier);
+            //visualisation.visualizeGesture(g.Points);
+            /* But for visualisation the following assemby references are required;
+             * System.Windows;
+             * System.Windows.Controls;
+             * System.Windows.Media;
+             * System.Windows.Shapes;
+             * System.Windows.Forms;
+             * System.Threading;
+             */
 
-            List<point> pvis = new List<point>();
 
-            foreach (Gesture g in shapes[shapeNumber].getGestures()) {
-                foreach (point p in g.Points) {
-                    pvis.Add(p);
+            //Necessary to determine wich machines are important to compare if ambiguity exists
+            int recognisedMachineID = -1;
+            int[] recognizedMachinesInGesture = new int[machineList.Count]; //to see wich machines are in conflict, remebers machine that return this for this gesture
+            bool recognised = false;
+
+
+            //Check every machine if it recognises the gesture
+            for (int m = 0; m < machineList.Count; m++) {
+                if (machineList[m].recognize(g)) {
+                    if (!recognised) {
+                        recognisedMachineID = m;
+                    }
+
+                    recognizedMachinesInGesture[m]++;
+                    recognised = true;
                 }
             }
 
-            visualiser vsl2 = new visualiser(machine.stateList,pvis);
-            vsl2.runVisualiser();
 
-            // **Recognition**
-
-            foreach (Gesture g in shapes[shapeNumber].getGestures())
-            {
-               machine.recognize(g);
-               Console.WriteLine("not recognized");
+            //No machine recognized
+            if (recognisedMachineID < 0) {
+                Console.WriteLine("No Gesture recognized");
+                return;
             }
-       
-       
+
+
+            //Handle machines that recognize Gesture at the same time:
+            //look for machine with shortest summed up distance between all points of the gesture and the corresponding State
+            double minDist = Double.MaxValue;
+            int minMachine = -1;
+            for (int i = 0; i < recognizedMachinesInGesture.Length; i++) {
+                if (recognizedMachinesInGesture[i] != 0) {
+                    if (machineList[i].getSumStateDistances() < minDist) {
+                        minMachine = i;
+                        minDist = machineList[i].getSumStateDistances();
+                    }
+                }
+            }
+            recognisedMachineID = minMachine;
+
+
+            Console.WriteLine("Gesture recognized as instance of Shape " + recognisedMachineID);
             Console.ReadLine();
+
+
+            //Evaluations
+            //First evaluation is for the finite state machines, the second is for the whole program
+            //The evaluation takes very long, because the clustering is done againwith different trainingsets
+            //The evaluation can be done without the above program (except reading in and scaling the data)
+            //evaluation ev1 = new evaluation(shapeList);
+            //evaluation ev2 = new evaluation(shapeList);
+            //ev1.evaluate(tresholdMultiplier, variance);
+            //ev2.evaluate2(tresholdMultiplier, variance);
+            //ev1.saveEvaluation("C:/Users/User/Desktop/FSMevaluation.csv");
+            //ev2.saveEvaluation("C:/Users/User/Desktop/programEvaluation.csv");
+
             return;
         }
     }
