@@ -5,7 +5,10 @@ using System.Runtime.Serialization;
 
 namespace SP_Bewegungserkennung
 {
-
+    /**
+    * Class State discibes a State that is created out of Cluster
+    * with temporal parameters
+    */
     [DataContract]
     class State
     {
@@ -17,6 +20,7 @@ namespace SP_Bewegungserkennung
         public int tMin { get; private set; }
         [DataMember]
         public int tMax { get; private set; }
+
         public State(Cluster c, int k , Shape s)
         {
             center = c.mean;

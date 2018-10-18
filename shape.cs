@@ -6,12 +6,15 @@ using System.Collections.Generic;
 
 namespace SP_Bewegungserkennung
 {
-
+    /**
+    *   Class Shape, which describes a general form of the gestures
+    *   One Shape is created as a List of gestures.
+    */
     public class Shape
     {
         private Dictionary<int, Gesture> gestures;
         public int shapeID { get; private set; }
-
+       
         public Shape(int shapeID, Gesture g)
         {
             this.shapeID = shapeID;

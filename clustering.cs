@@ -5,44 +5,52 @@ using System.Collections.Generic;
 
 namespace SP_Bewegungserkennung
 {
-
-    class KMclustering
+    /**
+    *   Class KmeansClustering, which preforms a k-means Clustering on a shape
+    */
+    class KmeansClustering
     {
         public int k { get; private set; }
-        public List<Cluster> CLlist { get; private set; }
-        private List<point> PList;
+        public List<Cluster> ClusterList { get; private set; }
+        private List<point> PointList;
         private point sigmaNull;
         private double epsilon;
 
-        public KMclustering(Shape s, point sNull, int k = 2, double epsilon = 0.5)
+       /**
+       * Constructor of a Clustering with a set gestures saved in Shape and the desired variance sNull 
+       */
+        public KmeansClustering(Shape s, point sNull, int k = 2, double epsilon = Double.Epsilon)
         {
             this.k = k;
             this.sigmaNull = sNull;
             this.epsilon = epsilon;
 
-            PList = new List<point>();
+            PointList = new List<point>();
 
             foreach (Gesture g in s.getGestures())
-                PList.AddRange(g.Points);
+                PointList.AddRange(g.Points);
 
-            CLlist = new List<Cluster>();
+            ClusterList = new List<Cluster>();
             for (int i = 0; i < k; ++i)
             {
-                CLlist.Add(new Cluster(PList.GetRange(i * PList.Count / k, Math.Min(PList.Count / k, PList.Count - i * PList.Count / k))));
+                ClusterList.Add(new Cluster(PointList.GetRange(i * PointList.Count / k, Math.Min(PointList.Count / k, PointList.Count - i * PointList.Count / k))));
             }
         }
-
         private point maxVariance()
         {
             point maxVariance = new point(0, 0);
-            foreach (Cluster c in CLlist)
+            foreach (Cluster c in ClusterList)
             {
                 if (c.variance.CompareTo(maxVariance) > 0)
                     maxVariance = c.variance;
             }
             return maxVariance;
         }
-
+        /**
+       *  Clustering preforms a dynamic k-means clustering in which value sNull is the termination close.
+       *  For determination which point lands in which cluster euclidean distance is used
+       *  New cluster is added when the mean of the clusters is not changing
+       */
         public void clustering()
         {
 
@@ -51,28 +59,23 @@ namespace SP_Bewegungserkennung
             do
             {
                 bool change;
-                //k-means
                 do
                 {
-                    foreach (Cluster c in CLlist)
+                    foreach (Cluster c in ClusterList)
                     {
                         c.clearCluster();
                     }
 
                     change = false;
 
-                    foreach (point p in PList)
+                    foreach (point p in PointList)
                     {
-
-                        //sometimes the mahalanobis distance becomes NaN, why is that?
-                        double minDist = CLlist[0].euclideanDist(p);
-                        Debug.Assert(!Double.IsNaN(minDist));
+                        double minDist = ClusterList[0].euclideanDist(p);
                         int DistX = 0;
 
-                        for (int j = 1; j < CLlist.Count; ++j)
+                        for (int j = 1; j < ClusterList.Count; ++j)
                         {
-                            double tmpDist = CLlist[j].euclideanDist(p);
-                            Debug.Assert(!Double.IsNaN(tmpDist));
+                            double tmpDist = ClusterList[j].euclideanDist(p);
 
                             if (tmpDist < minDist)
                             {
@@ -80,12 +83,11 @@ namespace SP_Bewegungserkennung
                                 DistX = j;
                             }
                         }
-                        CLlist[DistX].addToCluster(p);
+                        ClusterList[DistX].addToCluster(p);
                     }
 
-                    foreach (Cluster c in CLlist)
+                    foreach (Cluster c in ClusterList)
                     {
-                        //Debug.Assert(c.getPoints().Count > 0);
                         point oldMean = new point(c.mean);
                         c.updateCluster();
                         change |= !(c.mean.distance(oldMean) < epsilon);
@@ -98,10 +100,10 @@ namespace SP_Bewegungserkennung
                 {
                     k++;
                     int i = 0;
-                    while (!CLlist[i].variance.Equals(curVariance))
+                    while (!ClusterList[i].variance.Equals(curVariance))
                         ++i;
 
-                    CLlist.Add(CLlist[i].split());
+                    ClusterList.Add(ClusterList[i].split());
                 }
 
             } while (sigmaNull.CompareTo(curVariance) < 0);

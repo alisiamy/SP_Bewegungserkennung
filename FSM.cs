@@ -7,7 +7,10 @@ using System.IO;
 
 namespace SP_Bewegungserkennung
 {
-
+    /**
+    *Class FSM discribes a Finite State Machine created out of states and
+    * the further recognition of the gestures
+    */
     [DataContract]
     class FSM
     {
@@ -16,16 +19,22 @@ namespace SP_Bewegungserkennung
         private int currentState = 0;
         private int time = 0;
 
+       /**
+       * Enum Status describes three phases of the recognition
+       */
         public enum Status
         {
             RECOGNIZED,
             FAILED,
             RECOGNIZING
         }
-
-        public FSM(KMclustering cl, Shape s, int k)
+        /**
+       * Constructor of the FSM with result of the clustering, shape for temporal information calculation and tresholdMultiplier wihich 
+       * indirectly affects recognition rate
+       */
+        public FSM(KmeansClustering cl, Shape s, int tresholdMultuplier)
         {
-            stateList = clusterToState(orderClusters(cl.CLlist, s), k, s);
+            stateList = clusterToState(orderClusters(cl.ClusterList, s), tresholdMultuplier, s);
         }
 
         private List<Cluster> orderClusters(List<Cluster> CList, Shape s)
@@ -52,7 +61,7 @@ namespace SP_Bewegungserkennung
                     else if (idx != idxList[idxList.Count - 1])
                         idxList.Add(idx);
                 }
-                gestureClusterIdx.Add(idxList);  //error??
+                gestureClusterIdx.Add(idxList); 
             }
             List<Cluster> result = new List<Cluster>();
             for (int i = 0; i < gestureClusterIdx[0].Count; i++)
@@ -100,8 +109,9 @@ namespace SP_Bewegungserkennung
         }
 
 
-        //serialization
-
+        /**
+        * XML serialisation of a FSM
+        */
         public static void serialize(FSM f, string filepath)
         {
 
@@ -128,28 +138,25 @@ namespace SP_Bewegungserkennung
                 return f;
             }
         }
-
-
-        //for gesture recognition
+        /**
+         * Tick function is a function for the excution of a FSM
+         * can be also used for live recognition
+         */
         public FSM.Status tick(point livePoint)
         {
             if (currentState == stateList.Count - 1)
             {
-                Console.WriteLine("Gesture is recognized");
-
                 return Status.RECOGNIZED;
 
             }
-            if (!stateList[currentState].pointInState(livePoint) && currentState == 0 && time == 0)
-            { //FSM ist nicht aktiviert
-
+            if (!stateList[currentState].pointInState(livePoint) && currentState == 0 && time == 0) //FSM is not active
+            { 
                 return Status.FAILED;
             }
-            else if (stateList[currentState + 1].pointInState(livePoint))
-            { // point befindet sich im naechsten State
+            else if (stateList[currentState + 1].pointInState(livePoint)) // point is in the next state
+            { 
                 if (time >= stateList[currentState].tMin && time <= stateList[currentState].tMax)
                 {
-
                     currentState++;
                     time = 1;
                     return Status.RECOGNIZING;
@@ -162,31 +169,28 @@ namespace SP_Bewegungserkennung
                     return Status.FAILED;
                 }
                 else
-                {                                          //if(time< stateList[currentState].tMin)
+                {                                         
 
                     currentState = 0;
                     time = 0;
                     return Status.FAILED;
                 }
             }
-            else if (stateList[currentState].pointInState(livePoint))
+            else if (stateList[currentState].pointInState(livePoint)) //point is in state
             {
-                if (time <= stateList[currentState].tMax)
-                { //point ist im State
-
+                if (time <= stateList[currentState].tMax) 
+                { 
                     ++time;
                     return Status.RECOGNIZING;
                 }
-                else if (time > stateList[currentState].tMax)
-                { //Zeit wird ueberschritten
-
+                else if (time > stateList[currentState].tMax) //temporal parameters are exceeded
+                { 
                     currentState = 0;
                     time = 1;
                     return Status.FAILED;
                 }
                 else
-                {                                         //if( time< stateList[currentState].tMin)
-
+                {                                        
                     time++;
                     return Status.FAILED;
                 }
@@ -204,7 +208,9 @@ namespace SP_Bewegungserkennung
             currentState = 0;
             time = 0;
         }
-
+        /**
+         * Recognize function preformes a recognition ofline
+        */
         public bool recognize(Gesture g)
         {
 

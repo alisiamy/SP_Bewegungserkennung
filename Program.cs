@@ -10,7 +10,7 @@ namespace SP_Bewegungserkennung
 
         static void Main(string[] args)
         {
-            int shapeNumber = 4;  // shape to work with
+            int shapeNumber = 2;  // shape to work with
 
             //** Data for Clustering,FSM and Rcognition**
 
@@ -22,7 +22,7 @@ namespace SP_Bewegungserkennung
 
             //**Run Clustering**
 
-            KMclustering km = new KMclustering(shapes[shapeNumber], new point(50, 50), 2, Double.Epsilon);
+            KmeansClustering km = new KmeansClustering(shapes[shapeNumber], new point(25, 25), 2, Double.Epsilon);
             km.clustering();
 
             // **Visualize Clusters**

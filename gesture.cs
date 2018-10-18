@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 namespace SP_Bewegungserkennung
 {
-
+    /**
+    *   Class Geture, which describes a recoreded gesture consiting of points
+    */
     public class Gesture
     {
         public List<point> Points { get; set; }

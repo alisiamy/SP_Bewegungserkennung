@@ -9,27 +9,30 @@ using System.Globalization;
 
 namespace SP_Bewegungserkennung
 {
-
-    /*
-        parsing data line per line with line format:
-        FrameID;X;Y;Z;GestureID;SqlTime;Alpha;Beta;Velocity;ShapeId;UID
-    */
+    /**
+     * Class dataReader is parsing data line per line with line format:
+     * FrameID;X;Y;Z;GestureID;SqlTime;Alpha;Beta;Velocity;ShapeId;UID
+     */       
 
     enum LineFormat { FrameID, Y, X, Z, GestureID, SqlTime, Alpha, Beta, Velocity, ShapeID, UID };
 
-    //TODO: file validity checking and exception handling
     public class dataReader
     {
         string file;
         private Dictionary<int, Shape> shapes;
         const long FRAME = 30;
 
+        /**
+        * Consturctor of dataReader with a path of the file to read in string form
+        */
         public dataReader(string file)
         {
             this.file = file;
             this.shapes = new Dictionary<int, Shape>();
         }
-
+        /**
+       * readData function reads the data in LineFormat
+       */
         public List<Shape> readData()
         {
             foreach (string line in File.ReadLines(file))
@@ -84,8 +87,9 @@ namespace SP_Bewegungserkennung
         {
             return shapes.Values.ToList();
         }
-
-        //Scales all Gestures of one shape to fit in the range 1 to 100
+        /**
+         * scaleShapes function scales all gestures of one shape to fit in the range 1 to 100
+         */
         public void scaleShapes(List<Shape> shapeList)
         {
 
@@ -121,3 +125,4 @@ namespace SP_Bewegungserkennung
         }
     }
 }
+ 
