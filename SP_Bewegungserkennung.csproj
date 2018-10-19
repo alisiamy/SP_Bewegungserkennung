@@ -49,9 +49,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="evaluation.cs" />
     <Compile Include="shape.cs" />
-    <Compile Include="visualisation.cs" />
     <Compile Include="readData.cs" />
     <Compile Include="gesture.cs" />
     <Compile Include="FSM.cs" />

@@ -13,7 +13,7 @@ namespace SP_Bewegungserkennung {
 
 
             //Data for Clustering,FSM and Recognition
-            dataReader d = new dataReader("C:/Users/Mori/source/repos/ConsoleApp1/ConsoleApp1/bin/Release/KinectDaten_Pascal.csv");
+            dataReader d = new dataReader("C:/Users/User/source/repos/ConsoleApp1/ConsoleApp1/bin/Release/KinectDaten_Pascal.csv");
             List<Shape> shapeList = d.readData();
 
 
@@ -26,10 +26,10 @@ namespace SP_Bewegungserkennung {
 
 
             //Create Finite State Machine for each Shape
-            List<KMclustering> clusterList = new List<KMclustering>();
+            List<KmeansClustering> clusterList = new List<KmeansClustering>();
             List<FSM> machineList = new List<FSM>();
             for (int i = 0; i < shapeList.Count; ++i) {
-                KMclustering km = new KMclustering(shapeList[i], variance);
+                KmeansClustering km = new KmeansClustering(shapeList[i], variance);
 
                 km.clustering();
 
@@ -41,20 +41,6 @@ namespace SP_Bewegungserkennung {
             //Possibility to serialise FSM
             //FSM.serialize(machine, "testMachine.xml");
             //FSM fsm = FSM.deserialize("testMachine.xml");
-
-
-            //Possibilty to visualize a shape or a gesture
-            //int shapeToVisualize = 2;
-            //visualisation.visualizeShape(shapeList[shapeToVisualize], clusterList[shapeToVisualize].CLlist, tresholdMultiplier);
-            //visualisation.visualizeGesture(g.Points);
-            /* But for visualisation the following assemby references are required;
-             * System.Windows;
-             * System.Windows.Controls;
-             * System.Windows.Media;
-             * System.Windows.Shapes;
-             * System.Windows.Forms;
-             * System.Threading;
-             */
 
 
             //Necessary to determine wich machines are important to compare if ambiguity exists
@@ -100,18 +86,6 @@ namespace SP_Bewegungserkennung {
 
             Console.WriteLine("Gesture recognized as instance of Shape " + recognisedMachineID);
             Console.ReadLine();
-
-
-            //Evaluations
-            //First evaluation is for the finite state machines, the second is for the whole program
-            //The evaluation takes very long, because the clustering is done againwith different trainingsets
-            //The evaluation can be done without the above program (except reading in and scaling the data)
-            //evaluation ev1 = new evaluation(shapeList);
-            //evaluation ev2 = new evaluation(shapeList);
-            //ev1.evaluate(tresholdMultiplier, variance);
-            //ev2.evaluate2(tresholdMultiplier, variance);
-            //ev1.saveEvaluation("C:/Users/User/Desktop/FSMevaluation.csv");
-            //ev2.saveEvaluation("C:/Users/User/Desktop/programEvaluation.csv");
 
             return;
         }
